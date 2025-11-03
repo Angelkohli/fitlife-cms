@@ -8,11 +8,12 @@ A content management system for managing fitness class schedules, instructors, a
 - **Date Started:** Week 11, 2025
 
 ## Tech Stack
-- PHP 7.4+
+- HTML
+- PHP
 - MySQL with PDO
 - Apache Server
-- Bootstrap 4
-- jQuery
+- CSS
+- JavaScript
 
 ## Features (In Progress)
 - [ ] Admin class management (CRUD)
