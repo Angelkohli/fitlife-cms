@@ -1,0 +1,36 @@
+-- FitLife Winnipeg - Sample Data
+-- Categories
+INSERT INTO categories (category_name, category_description, category_icon, color_code, display_order) VALUES
+('Yoga', 'Improve flexibility, balance and mental clarity through various yoga styles', 'fa-spa', '#9C27B0', 1),
+('Cardio', 'High-energy classes to boost cardiovascular health and burn calories', 'fa-heartbeat', '#F44336', 2),
+('Strength', 'Build muscle and increase strength with resistance training', 'fa-dumbbell', '#FF9800', 3),
+('Dance', 'Fun rhythmic workouts combining dance moves with fitness', 'fa-music', '#E91E63', 4),
+('Cycling', 'Indoor cycling classes for endurance and leg strength', 'fa-bicycle', '#00BCD4', 5),
+('Mind-Body', 'Classes focused on mindfulness, flexibility and core strength', 'fa-leaf', '#4CAF50', 6);
+
+-- Fitness Classes (12 real classes with detailed descriptions)
+INSERT INTO classes (class_name, class_description, instructor_name, duration_minutes, difficulty_level, max_participants, day_of_week, start_time, class_location, room_number, equipment_needed, calories_burned_avg, category_id, is_active, is_featured, slug) VALUES
+
+('Morning Power Yoga', 'Start your day with an energizing yoga flow that combines strength-building poses with mindful breathing. This dynamic class will wake up your body and mind, improve flexibility, and set a positive tone for your entire day. Perfect for those who want to challenge themselves while maintaining a mindful practice.', 'Sarah Mitchell', 60, 'Intermediate', 25, 'Monday', '06:30:00', 'Downtown', 'Studio A', 'Yoga mat, water bottle', 350, 1, 1, 1, 'morning-power-yoga'),
+
+('HIIT Blast', 'High-Intensity Interval Training designed to maximize calorie burn in minimal time. This explosive workout alternates between intense bursts of activity and short recovery periods. Expect jumping jacks, burpees, mountain climbers, and more. This class will push your limits and deliver incredible results for both fat loss and cardiovascular fitness.', 'Marcus Johnson', 45, 'Advanced', 20, 'Monday', '17:30:00', 'Downtown', 'Main Floor', 'None required', 550, 2, 1, 1, 'hiit-blast'),
+
+('Beginner Hatha Yoga', 'A gentle introduction to yoga fundamentals, perfect for newcomers or those seeking a slower-paced practice. Learn proper alignment, basic poses, and breathing techniques in a supportive environment. This class emphasizes mindfulness and body awareness, helping you build a strong foundation for your yoga journey.', 'Lisa Chen', 60, 'Beginner', 30, 'Tuesday', '18:00:00', 'St. Vital', 'Studio B', 'Yoga mat, blocks (provided)', 250, 1, 1, 0, 'beginner-hatha-yoga'),
+
+('Spin City', 'Indoor cycling at its finest! Ride to the rhythm of energizing music as our instructor guides you through hills, sprints, and flat roads. This low-impact, high-intensity workout is perfect for all fitness levels. Adjust your bike resistance to match your personal goals while enjoying the motivation of a group setting.', 'David Torres', 50, 'All Levels', 24, 'Wednesday', '06:00:00', 'Downtown', 'Cycle Studio', 'Cycling shoes (optional)', 600, 5, 1, 1, 'spin-city'),
+
+('Body Pump Strength', 'Total body conditioning using barbells, weight plates, and high repetitions. This proven workout targets every major muscle group through squats, presses, lifts, and curls. Set to motivating music, you will build strength and endurance while burning calories. All fitness levels welcome as you choose your own weight load.', 'Amanda Rodriguez', 60, 'Intermediate', 22, 'Wednesday', '18:30:00', 'St. Vital', 'Strength Room', 'Barbell set, step platform', 480, 3, 1, 0, 'body-pump-strength'),
+
+('Zumba Fitness Party', 'Dance your way to fitness with this Latin-inspired cardio workout! Combining international music with easy-to-follow choreography, Zumba creates a party atmosphere that does not feel like exercise. No dance experience needed - just bring your energy and willingness to move. This class improves coordination, burns calories, and boosts mood.', 'Carmen Delgado', 55, 'All Levels', 35, 'Thursday', '19:00:00', 'Downtown', 'Dance Studio', 'Comfortable shoes, water', 500, 4, 1, 1, 'zumba-fitness-party'),
+
+('Pilates Core Strength', 'Focus on building a strong, stable core through controlled movements and proper breathing. Pilates improves posture, flexibility, and overall body awareness. Using mat work and small props, this class targets deep abdominal muscles and back stabilizers. Ideal for injury prevention and developing long, lean muscles.', 'Jennifer Park', 50, 'Intermediate', 18, 'Friday', '12:00:00', 'Downtown', 'Studio A', 'Mat, resistance band, small ball', 320, 6, 1, 0, 'pilates-core-strength'),
+
+('Saturday Sunrise Yoga', 'Welcome the weekend with a flowing vinyasa practice that links breath with movement. This all-levels class offers modifications and variations so everyone can work at their own pace. End with a relaxing savasana that leaves you feeling refreshed and ready for your weekend adventures.', 'Sarah Mitchell', 75, 'All Levels', 28, 'Saturday', '08:00:00', 'St. Vital', 'Studio B', 'Yoga mat, optional props', 380, 1, 1, 1, 'saturday-sunrise-yoga'),
+
+('Bootcamp Challenge', 'Military-inspired workout combining cardio, strength training, and endurance exercises. Expect push-ups, sprints, squats, and more in this challenging full-body workout. Our instructors will motivate you to push past your limits in a supportive team environment. This class delivers serious results for those ready to work hard.', 'Marcus Johnson', 60, 'Advanced', 20, 'Saturday', '09:30:00', 'Downtown', 'Outdoor/Main Floor', 'None - bodyweight focus', 620, 2, 1, 1, 'bootcamp-challenge'),
+
+('Gentle Restorative Yoga', 'Slow-paced class focusing on relaxation and recovery. Hold poses for longer periods using props for support, allowing your body to deeply release tension. Perfect for stress relief, injury recovery, or balancing intense training. This meditative practice calms the nervous system and promotes healing.', 'Lisa Chen', 70, 'Beginner', 20, 'Sunday', '10:00:00', 'Downtown', 'Studio A', 'Yoga mat, bolster, blanket (provided)', 180, 6, 1, 0, 'gentle-restorative-yoga'),
+
+('Strength and Conditioning', 'Build functional strength through compound movements and progressive overload. This class uses dumbbells, kettlebells, and resistance bands to increase muscle mass, bone density, and metabolic rate. Learn proper form and technique while working in a motivating group setting. Suitable for intermediate to advanced lifters.', 'David Torres', 55, 'Intermediate', 18, 'Tuesday', '17:00:00', 'St. Vital', 'Strength Room', 'Dumbbells, kettlebells, bands', 450, 3, 1, 0, 'strength-and-conditioning'),
+
+('Cardio Dance Mix', 'High-energy dance cardio that mixes hip-hop, pop, and contemporary styles. No choreography experience required - just follow along and have fun! This class improves coordination, cardiovascular fitness, and confidence while burning serious calories. Everyone is welcome regardless of dance background.', 'Carmen Delgado', 50, 'All Levels', 30, 'Friday', '18:00:00', 'St. Vital', 'Dance Studio', 'Athletic shoes, water bottle', 480, 4, 1, 0, 'cardio-dance-mix');
