@@ -15,13 +15,31 @@ $page_title = "Manage Classes";
 $is_admin = true;
 $css_path = '../../assets/css/style.css';
 
-// Fetch all classes with category information
-$stmt = $pdo->query("
+// Get sort parameter and validate (Feature 4.2 - ID sanitization)
+$allowed_sort = ['class_name', 'created_at', 'updated_at'];
+$sort_by = sanitizeString($_GET['sort'] ?? 'created_at');
+
+// Validate sort parameter
+if (!in_array($sort_by, $allowed_sort)) {
+    $sort_by = 'created_at';
+}
+
+// Get sort order (ascending or descending)
+$order = sanitizeString($_GET['order'] ?? 'DESC');
+$order = ($order === 'ASC') ? 'ASC' : 'DESC';
+
+// Toggle order for next click
+$next_order = ($order === 'ASC') ? 'DESC' : 'ASC';
+
+// Build query with sorting
+$sql = "
     SELECT c.*, cat.category_name 
     FROM classes c
     LEFT JOIN categories cat ON c.category_id = cat.category_id
-    ORDER BY c.created_at DESC
-");
+    ORDER BY c.$sort_by $order
+";
+
+$stmt = $pdo->query($sql);
 $classes = $stmt->fetchAll();
 
 include '../../includes/header.php';
@@ -39,6 +57,52 @@ include '../../includes/header.php';
     </div>
 </div>
 
+<!-- Sorting Controls (Feature 2.3) -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <strong><i class="fas fa-sort"></i> Sort By:</strong>
+            </div>
+            <div class="col-md-9">
+                <div class="btn-group" role="group">
+                    <a href="?sort=class_name&order=<?= ($sort_by === 'class_name') ? $next_order : 'ASC' ?>" 
+                       class="btn btn-<?= ($sort_by === 'class_name') ? 'primary' : 'outline-primary' ?>">
+                        Class Name
+                        <?php if ($sort_by === 'class_name'): ?>
+                            <i class="fas fa-sort-<?= strtolower($order) === 'asc' ? 'up' : 'down' ?>"></i>
+                        <?php endif; ?>
+                    </a>
+                    
+                    <a href="?sort=created_at&order=<?= ($sort_by === 'created_at') ? $next_order : 'DESC' ?>" 
+                       class="btn btn-<?= ($sort_by === 'created_at') ? 'primary' : 'outline-primary' ?>">
+                        Date Created
+                        <?php if ($sort_by === 'created_at'): ?>
+                            <i class="fas fa-sort-<?= strtolower($order) === 'asc' ? 'up' : 'down' ?>"></i>
+                        <?php endif; ?>
+                    </a>
+                    
+                    <a href="?sort=updated_at&order=<?= ($sort_by === 'updated_at') ? $next_order : 'DESC' ?>" 
+                       class="btn btn-<?= ($sort_by === 'updated_at') ? 'primary' : 'outline-primary' ?>">
+                        Date Updated
+                        <?php if ($sort_by === 'updated_at'): ?>
+                            <i class="fas fa-sort-<?= strtolower($order) === 'asc' ? 'up' : 'down' ?>"></i>
+                        <?php endif; ?>
+                    </a>
+                </div>
+                
+                <span class="ml-3 text-muted">
+                    <small>
+                        Currently sorting by: 
+                        <strong><?= ucwords(str_replace('_', ' ', $sort_by)) ?></strong> 
+                        (<?= $order === 'ASC' ? 'Ascending' : 'Descending' ?>)
+                    </small>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php if (count($classes) > 0): ?>
     <div class="card">
         <div class="card-body">
@@ -50,9 +114,6 @@ include '../../includes/header.php';
                             <th>Class Name</th>
                             <th>Instructor</th>
                             <th>Category</th>
-                            <th>Day & Time</th>
-                            <th>Location</th>
-                            <th>Capacity</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -77,14 +138,6 @@ include '../../includes/header.php';
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?= $class['day_of_week'] ?><br>
-                                    <small class="text-muted"><?= formatTime($class['start_time']) ?></small>
-                                </td>
-                                <td><?= $class['class_location'] ?></td>
-                                <td>
-                                    <?= $class['current_enrolled'] ?> / <?= $class['max_participants'] ?>
                                 </td>
                                 <td>
                                     <?php if ($class['is_active']): ?>

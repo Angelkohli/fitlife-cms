@@ -46,16 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'class_name' => sanitizeString($_POST['class_name'] ?? ''),
         'class_description' => sanitizeString($_POST['class_description'] ?? ''),
         'instructor_name' => sanitizeString($_POST['instructor_name'] ?? ''),
-        'duration_minutes' => sanitizeID($_POST['duration_minutes'] ?? 0),
-        'difficulty_level' => sanitizeString($_POST['difficulty_level'] ?? ''),
-        'max_participants' => sanitizeID($_POST['max_participants'] ?? 0),
-        'current_enrolled' => sanitizeID($_POST['current_enrolled'] ?? 0),
-        'day_of_week' => sanitizeString($_POST['day_of_week'] ?? ''),
-        'start_time' => sanitizeString($_POST['start_time'] ?? ''),
-        'class_location' => sanitizeString($_POST['class_location'] ?? ''),
-        'room_number' => sanitizeString($_POST['room_number'] ?? ''),
-        'equipment_needed' => sanitizeString($_POST['equipment_needed'] ?? ''),
-        'calories_burned_avg' => sanitizeID($_POST['calories_burned_avg'] ?? 0),
         'category_id' => !empty($_POST['category_id']) ? sanitizeID($_POST['category_id']) : null,
         'is_active' => isset($_POST['is_active']) ? 1 : 0,
         'is_featured' => isset($_POST['is_featured']) ? 1 : 0
@@ -74,16 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 class_name = :class_name,
                 class_description = :class_description,
                 instructor_name = :instructor_name,
-                duration_minutes = :duration_minutes,
-                difficulty_level = :difficulty_level,
-                max_participants = :max_participants,
-                current_enrolled = :current_enrolled,
-                day_of_week = :day_of_week,
-                start_time = :start_time,
-                class_location = :class_location,
-                room_number = :room_number,
-                equipment_needed = :equipment_needed,
-                calories_burned_avg = :calories_burned_avg,
                 category_id = :category_id,
                 is_active = :is_active,
                 is_featured = :is_featured,
@@ -95,16 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':class_name' => $form_data['class_name'],
                 ':class_description' => $form_data['class_description'],
                 ':instructor_name' => $form_data['instructor_name'],
-                ':duration_minutes' => $form_data['duration_minutes'],
-                ':difficulty_level' => $form_data['difficulty_level'],
-                ':max_participants' => $form_data['max_participants'],
-                ':current_enrolled' => $form_data['current_enrolled'],
-                ':day_of_week' => $form_data['day_of_week'],
-                ':start_time' => $form_data['start_time'],
-                ':class_location' => $form_data['class_location'],
-                ':room_number' => $form_data['room_number'],
-                ':equipment_needed' => $form_data['equipment_needed'],
-                ':calories_burned_avg' => $form_data['calories_burned_avg'],
                 ':category_id' => $form_data['category_id'],
                 ':is_active' => $form_data['is_active'],
                 ':is_featured' => $form_data['is_featured'],
@@ -196,167 +166,6 @@ include '../../includes/header.php';
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Schedule Details -->
-                    <h4 class="border-bottom pb-2 mb-3 mt-4">Schedule Details</h4>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="day_of_week">Day of Week *</label>
-                                <select class="form-control" id="day_of_week" name="day_of_week" required>
-                                    <?php 
-                                    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                                    foreach ($days as $day): 
-                                    ?>
-                                        <option value="<?= $day ?>" <?= $class['day_of_week'] === $day ? 'selected' : '' ?>>
-                                            <?= $day ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="start_time">Start Time *</label>
-                                <input type="time" 
-                                       class="form-control" 
-                                       id="start_time" 
-                                       name="start_time"
-                                       value="<?= $class['start_time'] ?>"
-                                       required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="duration_minutes">Duration (minutes) *</label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="duration_minutes" 
-                                       name="duration_minutes"
-                                       value="<?= $class['duration_minutes'] ?>"
-                                       min="15"
-                                       max="180"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="class_location">Location *</label>
-                                <select class="form-control" id="class_location" name="class_location" required>
-                                    <option value="Downtown" <?= $class['class_location'] === 'Downtown' ? 'selected' : '' ?>>Downtown</option>
-                                    <option value="St. Vital" <?= $class['class_location'] === 'St. Vital' ? 'selected' : '' ?>>St. Vital</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="room_number">Room Number</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="room_number" 
-                                       name="room_number"
-                                       value="<?= sanitizeString($class['room_number']) ?>">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Class Details -->
-                    <h4 class="border-bottom pb-2 mb-3 mt-4">Class Details</h4>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="difficulty_level">Difficulty Level *</label>
-                                <select class="form-control" id="difficulty_level" name="difficulty_level" required>
-                                    <?php 
-                                    $levels = ['Beginner', 'Intermediate', 'Advanced', 'All Levels'];
-                                    foreach ($levels as $level): 
-                                    ?>
-                                        <option value="<?= $level ?>" <?= $class['difficulty_level'] === $level ? 'selected' : '' ?>>
-                                            <?= $level ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="max_participants">Max Participants *</label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="max_participants" 
-                                       name="max_participants"
-                                       value="<?= $class['max_participants'] ?>"
-                                       min="1"
-                                       max="100"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="current_enrolled">Current Enrolled</label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="current_enrolled" 
-                                       name="current_enrolled"
-                                       value="<?= $class['current_enrolled'] ?>"
-                                       min="0">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="calories_burned_avg">Avg. Calories Burned</label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="calories_burned_avg" 
-                                       name="calories_burned_avg"
-                                       value="<?= $class['calories_burned_avg'] ?>"
-                                       min="0">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="equipment_needed">Equipment Needed</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="equipment_needed" 
-                                       name="equipment_needed"
-                                       value="<?= sanitizeString($class['equipment_needed']) ?>">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Status Options -->
-                    <h4 class="border-bottom pb-2 mb-3 mt-4">Status</h4>
-                    
-                    <div class="form-check mb-2">
-                        <input type="checkbox" 
-                               class="form-check-input" 
-                               id="is_active" 
-                               name="is_active"
-                               <?= $class['is_active'] ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="is_active">
-                            Active (visible to public)
-                        </label>
-                    </div>
-                    
-                    <div class="form-check mb-3">
-                        <input type="checkbox" 
-                               class="form-check-input" 
-                               id="is_featured" 
-                               name="is_featured"
-                               <?= $class['is_featured'] ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="is_featured">
-                            Featured (highlight on homepage)
-                        </label>
                     </div>
                     
                     <!-- Submit Buttons -->

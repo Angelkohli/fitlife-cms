@@ -179,9 +179,6 @@ include '../includes/header.php';
                                     <th>Class Name</th>
                                     <th>Instructor</th>
                                     <th>Category</th>
-                                    <th>Day</th>
-                                    <th>Time</th>
-                                    <th>Location</th>
                                     <th>Status</th>
                                     <th>Added</th>
                                 </tr>
@@ -198,9 +195,6 @@ include '../includes/header.php';
                                                 <?= sanitizeString($class['category_name'] ?? 'Uncategorized') ?>
                                             </span>
                                         </td>
-                                        <td><?= sanitizeString($class['day_of_week']) ?></td>
-                                        <td><?= formatTime($class['start_time']) ?></td>
-                                        <td><?= sanitizeString($class['class_location']) ?></td>
                                         <td>
                                             <?php if ($class['is_active']): ?>
                                                 <span class="badge badge-success">Active</span>
