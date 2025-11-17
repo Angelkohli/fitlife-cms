@@ -3,6 +3,7 @@
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
+require_once '../../includes/image_upload.php';
 
 initSession();
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
@@ -37,6 +38,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate form data (Feature 4.1)
     $errors = validateClassData($form_data);
     
+    // Handle image upload (Feature 6.1)
+    $uploaded_image = null;
+    if (isset($_FILES['instructor_image']) && $_FILES['instructor_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $upload_result = uploadInstructorImage($_FILES['instructor_image']);
+        if ($upload_result['success']) {
+            $uploaded_image = $upload_result['filename'];
+        } else {
+            $errors[] = 'Image upload error: ' . $upload_result['error'];
+        }
+    }
+
     // If no errors, insert into database
     if (empty($errors)) {
         try {
@@ -91,7 +103,7 @@ include '../../includes/header.php';
         
         <div class="card">
             <div class="card-body">
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     <!-- Basic Information -->
                     <h4 class="border-bottom pb-2 mb-3">Basic Information</h4>
                     
@@ -143,6 +155,22 @@ include '../../includes/header.php';
                         </div>
                     </div>
                     
+                    <!-- Image Upload (Feature 6.1) -->
+                    <div class="form-group">
+                        <label for="instructor_image">Instructor Photo (Optional)</label>
+                        <input type="file" 
+                               class="form-control-file" 
+                               id="instructor_image" 
+                               name="instructor_image"
+                               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                        <small class="form-text text-muted">
+                            Maximum file size: 5MB. Allowed formats: JPG, PNG, GIF, WebP
+                        </small>
+                        <div id="image-preview" class="mt-2" style="display: none;">
+                            <img src="" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
+                        </div>
+                    </div>
+
                     <!-- Status Options -->
                     <h4 class="border-bottom pb-2 mb-3 mt-4">Status</h4>
                     
@@ -182,5 +210,23 @@ include '../../includes/header.php';
         </div>
     </div>
 </div>
+
+<script>
+// Image preview
+document.getElementById('instructor_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('image-preview');
+            const img = preview.querySelector('img');
+            img.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+
 
 <?php include '../../includes/footer.php'; ?>

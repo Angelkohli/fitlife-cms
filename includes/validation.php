@@ -61,38 +61,6 @@ function validateClassData($data) {
         $errors[] = "Instructor name is required";
     }
     
-    // Duration validation
-    if (empty($data['duration_minutes']) || $data['duration_minutes'] < 15 || $data['duration_minutes'] > 180) {
-        $errors[] = "Duration must be between 15 and 180 minutes";
-    }
-    
-    // Max participants validation
-    if (empty($data['max_participants']) || $data['max_participants'] < 1 || $data['max_participants'] > 100) {
-        $errors[] = "Maximum participants must be between 1 and 100";
-    }
-    
-    // Day of week validation
-    $valid_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    if (empty($data['day_of_week']) || !in_array($data['day_of_week'], $valid_days)) {
-        $errors[] = "Valid day of week is required";
-    }
-    
-    // Start time validation
-    if (empty($data['start_time'])) {
-        $errors[] = "Start time is required";
-    }
-    
-    // Location validation
-    $valid_locations = ['Downtown', 'St. Vital'];
-    if (empty($data['class_location']) || !in_array($data['class_location'], $valid_locations)) {
-        $errors[] = "Valid location is required";
-    }
-    
-    // Difficulty level validation
-    $valid_levels = ['Beginner', 'Intermediate', 'Advanced', 'All Levels'];
-    if (empty($data['difficulty_level']) || !in_array($data['difficulty_level'], $valid_levels)) {
-        $errors[] = "Valid difficulty level is required";
-    }
     
     // Category validation (if provided)
     if (!empty($data['category_id'])) {

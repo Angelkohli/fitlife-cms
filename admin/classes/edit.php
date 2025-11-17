@@ -3,6 +3,7 @@
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
+require_once '../../includes/image_upload.php';
 
 initSession();
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
@@ -51,6 +52,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'is_featured' => isset($_POST['is_featured']) ? 1 : 0
     ];
     
+    // Handle image operations (Feature 6.1 & 6.2)
+    $new_image_path = $class['instructor_image_path'];
+
+    // Delete existing image if requested
+    if (isset($_POST['delete_image']) && $class['instructor_image_path']) {
+        deleteInstructorImage($class['instructor_image_path']);
+        $new_image_path = null;
+    }
+
+    // Upload new image if provided
+    if (isset($_FILES['instructor_image']) && $_FILES['instructor_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $upload_result = uploadInstructorImage($_FILES['instructor_image']);
+        if ($upload_result['success']) {
+            // Delete old image if exists
+            if ($class['instructor_image_path']) {
+                deleteInstructorImage($class['instructor_image_path']);
+            }
+            $new_image_path = $upload_result['filename'];
+        } else {
+            $errors[] = 'Image upload error: ' . $upload_result['error'];
+        }
+    }
+
     // Validate form data
     $errors = validateClassData($form_data);
     
@@ -68,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 is_active = :is_active,
                 is_featured = :is_featured,
                 slug = :slug
+                instructor_image_path = :instructor_image_path
                 WHERE class_id = :class_id";
             
             $stmt = $pdo->prepare($sql);
@@ -79,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':is_active' => $form_data['is_active'],
                 ':is_featured' => $form_data['is_featured'],
                 ':slug' => $slug,
+                ':instructor_image_path' => $new_image_path,
                 ':class_id' => $class_id
             ]);
             
@@ -116,7 +142,7 @@ include '../../includes/header.php';
         
         <div class="card">
             <div class="card-body">
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     <!-- Basic Information -->
                     <h4 class="border-bottom pb-2 mb-3">Basic Information</h4>
                     
@@ -139,9 +165,44 @@ include '../../includes/header.php';
                                   required><?= sanitizeString($class['class_description']) ?></textarea>
                         <small class="form-text text-muted">Minimum 20 characters</small>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
+
+                            <!-- Current Image Display (Feature 6.4) -->
+                            <?php if ($class['instructor_image_path']): ?>
+                                <div class="form-group">
+                                    <label>Current Instructor Photo</label>
+                                    <div>
+                                        <img src="../../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                                            alt="Current instructor photo" 
+                                            class="img-thumbnail"
+                                            style="max-width: 200px;">
+                                    </div>
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" class="form-check-input" id="delete_image" name="delete_image">
+                                        <label class="form-check-label" for="delete_image">
+                                            Delete current image
+                                        </label>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <!-- Upload New Image (Feature 6.1) -->
+                            <div class="form-group">
+                                <label for="instructor_image">
+                                    <?= $class['instructor_image_path'] ? 'Replace' : 'Upload' ?> Instructor Photo (Optional)
+                                </label>
+                                <input type="file" 
+                                    class="form-control-file" 
+                                    id="instructor_image" 
+                                    name="instructor_image"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                                <small class="form-text text-muted">
+                                    Maximum file size: 5MB. Allowed formats: JPG, PNG, GIF, WebP
+                                </small>
+                            </div>
+
                             <div class="form-group">
                                 <label for="instructor_name">Instructor Name *</label>
                                 <input type="text" 

@@ -67,7 +67,7 @@ include '../includes/header.php';
     <div class="col-lg-8 mb-4">
         <div class="card">
             <?php if ($class['instructor_image_path']): ?>
-                <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                <img src="../../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                      class="card-img-top" 
                      alt="<?= sanitizeString($class['instructor_name']) ?>"
                      style="max-height: 400px; object-fit: cover;">
@@ -178,51 +178,6 @@ include '../includes/header.php';
     
     <!-- Sidebar -->
     <div class="col-lg-4">
-        <!-- Schedule Card -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Schedule</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <strong><i class="fas fa-calendar-day"></i> Day:</strong><br>
-                    <?= $class['day_of_week'] ?>s
-                </div>
-                <div class="mb-3">
-                    <strong><i class="fas fa-clock"></i> Time:</strong><br>
-                    <?= formatTime($class['start_time']) ?>
-                </div>
-                <div class="mb-3">
-                    <strong><i class="fas fa-hourglass-half"></i> Duration:</strong><br>
-                    <?= $class['duration_minutes'] ?> minutes
-                </div>
-                <div class="mb-3">
-                    <strong><i class="fas fa-map-marker-alt"></i> Location:</strong><br>
-                    <?= $class['class_location'] ?>
-                    <?php if ($class['room_number']): ?>
-                        <br><small class="text-muted">Room: <?= sanitizeString($class['room_number']) ?></small>
-                    <?php endif; ?>
-                </div>
-                <div class="mb-3">
-                    <strong><i class="fas fa-users"></i> Capacity:</strong><br>
-                    <?= $class['current_enrolled'] ?> / <?= $class['max_participants'] ?> enrolled
-                    <?php 
-                    $spots_left = $class['max_participants'] - $class['current_enrolled'];
-                    if ($spots_left > 0): 
-                    ?>
-                        <br><small class="text-success"><?= $spots_left ?> spots available</small>
-                    <?php else: ?>
-                        <br><small class="text-danger">Class Full</small>
-                    <?php endif; ?>
-                </div>
-                <?php if ($class['calories_burned_avg']): ?>
-                    <div class="mb-0">
-                        <strong><i class="fas fa-fire text-danger"></i> Calories Burned:</strong><br>
-                        ~<?= $class['calories_burned_avg'] ?> calories (average)
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
         
         <!-- Instructor Card -->
         <div class="card mb-4">
@@ -231,7 +186,7 @@ include '../includes/header.php';
             </div>
             <div class="card-body text-center">
                 <?php if ($class['instructor_image_path']): ?>
-                    <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                    <img src="../../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                          class="rounded-circle mb-3" 
                          alt="<?= sanitizeString($class['instructor_name']) ?>"
                          style="width: 120px; height: 120px; object-fit: cover;">
