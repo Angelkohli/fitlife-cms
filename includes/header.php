@@ -32,6 +32,24 @@ if (session_status() === PHP_SESSION_NONE) {
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Search Form (Feature 3.1) -->
+                <?php if (!isset($is_admin) || !$is_admin): ?>
+                    <form method="GET" action="<?= isset($is_admin) && $is_admin ? '../public/search.php' : 'search.php' ?>" class="form-inline mx-auto my-2 my-lg-0">
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="q" 
+                                   placeholder="Search classes..."
+                                   style="width: 250px;">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-outline-light">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                <?php endif; ?>
+                
                 <ul class="navbar-nav ml-auto">
                     <?php if (isset($is_admin) && $is_admin): ?>
                         <!-- Admin Navigation -->
