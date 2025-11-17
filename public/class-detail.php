@@ -67,7 +67,7 @@ include '../includes/header.php';
     <div class="col-lg-8 mb-4">
         <div class="card">
             <?php if ($class['instructor_image_path']): ?>
-                <img src="../../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                      class="card-img-top" 
                      alt="<?= sanitizeString($class['instructor_name']) ?>"
                      style="max-height: 400px; object-fit: cover;">
@@ -162,16 +162,146 @@ include '../includes/header.php';
             </div>
         </div>
         
-        <!-- Comment Form Placeholder -->
+        <!-- Comment Form (Feature 2.9 - 5 marks) -->
         <div class="card mt-4" id="comment-form">
-            <div class="card-header">
+            <div class="card-header bg-primary text-white">
                 <h4 class="mb-0"><i class="fas fa-edit"></i> Leave a Review</h4>
             </div>
             <div class="card-body">
-                <p class="text-muted">
-                    <i class="fas fa-info-circle"></i> 
-                    Comment submission will be enabled in Week 13 (Feature 2.9)
-                </p>
+                <?php
+                // Handle comment submission
+                $comment_errors = [];
+                $comment_success = false;
+                
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
+                    // Sanitize input
+                    $comment_data = [
+                        'member_name' => sanitizeString($_POST['member_name'] ?? ''),
+                        'review_text' => sanitizeString($_POST['review_text'] ?? ''),
+                        'review_rating' => sanitizeID($_POST['review_rating'] ?? 0)
+                    ];
+                    
+                    // Validate
+                    $comment_errors = validateCommentData($comment_data);
+                    
+                    if (empty($comment_errors)) {
+                        try {
+                            $sql = "INSERT INTO reviews (
+                                class_id, member_name, review_text, review_rating,
+                                difficulty_accurate, would_recommend, is_approved
+                            ) VALUES (
+                                :class_id, :member_name, :review_text, :review_rating,
+                                :difficulty_accurate, :would_recommend, 0
+                            )";
+                            
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute([
+                                ':class_id' => $class_id,
+                                ':member_name' => $comment_data['member_name'],
+                                ':review_text' => $comment_data['review_text'],
+                                ':review_rating' => $comment_data['review_rating'],
+                                ':difficulty_accurate' => isset($_POST['difficulty_accurate']) ? 1 : 0,
+                                ':would_recommend' => isset($_POST['would_recommend']) ? 1 : 0
+                            ]);
+                            
+                            $comment_success = true;
+                            
+                        } catch (PDOException $e) {
+                            $comment_errors[] = "Error submitting review: " . $e->getMessage();
+                        }
+                    }
+                }
+                ?>
+                
+                <?php if ($comment_success): ?>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> 
+                        <strong>Thank you for your review!</strong> 
+                        Your review has been submitted and will appear after moderation by our staff.
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($comment_errors)): ?>
+                    <div class="alert alert-danger">
+                        <strong>Please fix the following errors:</strong>
+                        <ul class="mb-0">
+                            <?php foreach ($comment_errors as $error): ?>
+                                <li><?= $error ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!$comment_success): ?>
+                    <form method="POST" action="#comment-form" >
+                        <div class="form-group">
+                            <label for="member_name">Your Name *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="member_name" 
+                                   name="member_name"
+                                   value="<?= isset($comment_data) ? $comment_data['member_name'] : '' ?>"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="review_rating">Rating *</label>
+                            <select class="form-control" id="review_rating" name="review_rating" required>
+                                <option value="">-- Select Rating --</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5 stars - Excellent)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 stars - Very Good)</option>
+                                <option value="3">⭐⭐⭐ (3 stars - Good)</option>
+                                <option value="2">⭐⭐ (2 stars - Fair)</option>
+                                <option value="1">⭐ (1 star - Poor)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="review_text">Your Review *</label>
+                            <textarea class="form-control" 
+                                      id="review_text" 
+                                      name="review_text"
+                                      rows="5"
+                                      placeholder="Share your experience with this class..."
+                                      required><?= isset($comment_data) ? $comment_data['review_text'] : '' ?></textarea>
+                            <small class="form-text text-muted">Minimum 10 characters</small>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="difficulty_accurate" 
+                                   name="difficulty_accurate">
+                            <label class="form-check-label" for="difficulty_accurate">
+                                The difficulty level was accurate
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="would_recommend" 
+                                   name="would_recommend"
+                                   checked>
+                            <label class="form-check-label" for="would_recommend">
+                                I would recommend this class to others
+                            </label>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Your review will be reviewed by our staff before being published.
+                        </div>
+                        
+                        <button type="submit" name="submit_review" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i> Submit Review
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <a href="class-detail.php?id=<?= $class_id ?>" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Submit Another Review
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -186,7 +316,7 @@ include '../includes/header.php';
             </div>
             <div class="card-body text-center">
                 <?php if ($class['instructor_image_path']): ?>
-                    <img src="../../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                    <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                          class="rounded-circle mb-3" 
                          alt="<?= sanitizeString($class['instructor_name']) ?>"
                          style="width: 120px; height: 120px; object-fit: cover;">
