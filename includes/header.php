@@ -93,17 +93,26 @@ if (!defined('BASE_URL')) {
                             <li class="nav-item">
                                 <span class="nav-link text-light">
                                     <i class="fas fa-user"></i> <?= sanitizeString($_SESSION['full_name'] ?? $_SESSION['username']) ?>
+                                    <?php if (isAdmin()): ?>
+                                        <span class="badge badge-warning ml-1">Admin</span>
+                                    <?php endif; ?>
                                 </span>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-warning" href="<?php echo BASE_URL; ?>/admin/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                                <a class="nav-link text-warning" href="<?php echo BASE_URL; ?>/public/logout.php">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
                             </li>
                         <?php else: ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                <a class="nav-link" href="login.php">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="register.php"><i class="fas fa-user-plus"></i> Register</a>
+                                <a class="nav-link" href="register.php">
+                                    <i class="fas fa-user-plus"></i> Register
+                                </a>
                             </li>
                         <?php endif; ?>
                     <?php endif; ?>

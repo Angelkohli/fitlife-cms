@@ -5,6 +5,13 @@
  */
 
 /**
+ * Check if GD extension is available for image processing
+ */
+function isGDAvailable() {
+    return extension_loaded('gd') && function_exists('imagecreatefromjpeg');
+}
+
+/**
  * Upload instructor image
  * @param array $file $_FILES array element
  * @param string $upload_dir Upload directory path
@@ -62,8 +69,13 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
     
     // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $target_path)) {
-        // Auto-resize image (Feature 6.3 - 5 marks)
-        resizeImage($target_path, 800, 600);
+        // Auto-resize image only if GD is available (Feature 6.3 - 5 marks)
+        if (isGDAvailable()) {
+            resizeImage($target_path, 800, 600);
+        } else {
+            error_log("GD extension not available - image uploaded but not resized");
+            // You might want to show a warning to the admin
+        }
         
         $result['success'] = true;
         $result['filename'] = $filename;
@@ -82,6 +94,12 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
  * @return bool Success status
  */
 function resizeImage($file_path, $max_width = 800, $max_height = 600) {
+    // Check if GD is available
+    if (!isGDAvailable()) {
+        error_log("GD extension not available - cannot resize image");
+        return false;
+    }
+    
     // Get image info
     $image_info = getimagesize($file_path);
     if ($image_info === false) {
@@ -118,7 +136,7 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
             return false;
     }
     
-    if (!$source) {
+    if ($source === false) {
         return false;
     }
     
@@ -137,18 +155,19 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
     imagecopyresampled($resized, $source, 0, 0, 0, 0, $new_width, $new_height, $orig_width, $orig_height);
     
     // Save resized image
+    $result = false;
     switch ($image_type) {
         case IMAGETYPE_JPEG:
-            imagejpeg($resized, $file_path, 90);
+            $result = imagejpeg($resized, $file_path, 90);
             break;
         case IMAGETYPE_PNG:
-            imagepng($resized, $file_path, 9);
+            $result = imagepng($resized, $file_path, 9);
             break;
         case IMAGETYPE_GIF:
-            imagegif($resized, $file_path);
+            $result = imagegif($resized, $file_path);
             break;
         case IMAGETYPE_WEBP:
-            imagewebp($resized, $file_path, 90);
+            $result = imagewebp($resized, $file_path, 90);
             break;
     }
     
@@ -156,8 +175,10 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
     imagedestroy($source);
     imagedestroy($resized);
     
-    return true;
+    return $result;
 }
+
+// ... rest of your existing functions remain the same ...
 
 /**
  * Delete instructor image
