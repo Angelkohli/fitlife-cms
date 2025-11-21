@@ -7,7 +7,7 @@ require_once '../includes/validation.php';
 // Simple authentication for Week 11 (will improve in Week 14)
 initSession();
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    header('Location: login.php');
+    header('Location: ../public/login.php');
     exit;
 }
 

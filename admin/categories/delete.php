@@ -6,7 +6,7 @@ require_once '../../includes/validation.php';
 
 initSession();
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    header('Location: ../login.php');
+    header('Location: ../public/login.php');
     exit;
 }
 
