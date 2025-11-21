@@ -10,7 +10,7 @@
  * @param string $upload_dir Upload directory path
  * @return array ['success' => bool, 'filename' => string, 'error' => string]
  */
-function uploadInstructorImage($file, $upload_dir = '../../uploads/instructors/') {
+function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
     $result = [
         'success' => false,
         'filename' => null,
@@ -62,6 +62,9 @@ function uploadInstructorImage($file, $upload_dir = '../../uploads/instructors/'
     
     // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $target_path)) {
+        // Auto-resize image (Feature 6.3 - 5 marks)
+        resizeImage($target_path, 800, 600);
+        
         $result['success'] = true;
         $result['filename'] = $filename;
     } else {
@@ -69,6 +72,91 @@ function uploadInstructorImage($file, $upload_dir = '../../uploads/instructors/'
     }
     
     return $result;
+}
+
+/**
+ * Resize image to maximum dimensions (Feature 6.3)
+ * @param string $file_path Path to image file
+ * @param int $max_width Maximum width
+ * @param int $max_height Maximum height
+ * @return bool Success status
+ */
+function resizeImage($file_path, $max_width = 800, $max_height = 600) {
+    // Get image info
+    $image_info = getimagesize($file_path);
+    if ($image_info === false) {
+        return false;
+    }
+    
+    list($orig_width, $orig_height, $image_type) = $image_info;
+    
+    // Check if resize is needed
+    if ($orig_width <= $max_width && $orig_height <= $max_height) {
+        return true; // No resize needed
+    }
+    
+    // Calculate new dimensions
+    $ratio = min($max_width / $orig_width, $max_height / $orig_height);
+    $new_width = round($orig_width * $ratio);
+    $new_height = round($orig_height * $ratio);
+    
+    // Create image resource from file
+    switch ($image_type) {
+        case IMAGETYPE_JPEG:
+            $source = imagecreatefromjpeg($file_path);
+            break;
+        case IMAGETYPE_PNG:
+            $source = imagecreatefrompng($file_path);
+            break;
+        case IMAGETYPE_GIF:
+            $source = imagecreatefromgif($file_path);
+            break;
+        case IMAGETYPE_WEBP:
+            $source = imagecreatefromwebp($file_path);
+            break;
+        default:
+            return false;
+    }
+    
+    if (!$source) {
+        return false;
+    }
+    
+    // Create new image
+    $resized = imagecreatetruecolor($new_width, $new_height);
+    
+    // Preserve transparency for PNG and GIF
+    if ($image_type == IMAGETYPE_PNG || $image_type == IMAGETYPE_GIF) {
+        imagealphablending($resized, false);
+        imagesavealpha($resized, true);
+        $transparent = imagecolorallocatealpha($resized, 255, 255, 255, 127);
+        imagefilledrectangle($resized, 0, 0, $new_width, $new_height, $transparent);
+    }
+    
+    // Resize
+    imagecopyresampled($resized, $source, 0, 0, 0, 0, $new_width, $new_height, $orig_width, $orig_height);
+    
+    // Save resized image
+    switch ($image_type) {
+        case IMAGETYPE_JPEG:
+            imagejpeg($resized, $file_path, 90);
+            break;
+        case IMAGETYPE_PNG:
+            imagepng($resized, $file_path, 9);
+            break;
+        case IMAGETYPE_GIF:
+            imagegif($resized, $file_path);
+            break;
+        case IMAGETYPE_WEBP:
+            imagewebp($resized, $file_path, 90);
+            break;
+    }
+    
+    // Free memory
+    imagedestroy($source);
+    imagedestroy($resized);
+    
+    return true;
 }
 
 /**

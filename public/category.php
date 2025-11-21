@@ -36,7 +36,7 @@ $stmt = $pdo->prepare("
     FROM classes c
     LEFT JOIN categories cat ON c.category_id = cat.category_id
     WHERE c.category_id = :category_id AND c.is_active = 1
-    ORDER BY c.day_of_week, c.start_time
+    ORDER BY c.class_id ASC
 ");
 $stmt->execute([':category_id' => $category_id]);
 $classes = $stmt->fetchAll();
@@ -114,7 +114,7 @@ include '../includes/header.php';
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow-sm" style="border-top: 4px solid <?= sanitizeString($category['color_code']) ?>">
                     <?php if ($class['instructor_image_path']): ?>
-                        <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                        <img src="../admin/uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                              class="card-img-top" 
                              alt="<?= sanitizeString($class['instructor_name']) ?>"
                              style="height: 200px; object-fit: cover;">
@@ -128,9 +128,6 @@ include '../includes/header.php';
                     
                     <div class="card-body">
                         <div class="mb-2">
-                            <span class="badge badge-<?= getDifficultyBadgeColor($class['difficulty_level']) ?>">
-                                <?= $class['difficulty_level'] ?>
-                            </span>
                             <?php if ($class['is_featured']): ?>
                                 <span class="badge badge-warning">
                                     <i class="fas fa-star"></i> Featured
@@ -146,16 +143,7 @@ include '../includes/header.php';
                         
                         <div class="small text-muted mb-3">
                             <div><i class="fas fa-user"></i> <?= sanitizeString($class['instructor_name']) ?></div>
-                            <div><i class="fas fa-calendar-day"></i> <?= $class['day_of_week'] ?>s at <?= formatTime($class['start_time']) ?></div>
-                            <div><i class="fas fa-map-marker-alt"></i> <?= $class['class_location'] ?></div>
-                            <div><i class="fas fa-clock"></i> <?= $class['duration_minutes'] ?> minutes</div>
-                            <div>
-                                <i class="fas fa-users"></i> 
-                                <?= $class['current_enrolled'] ?> / <?= $class['max_participants'] ?> enrolled
-                            </div>
-                            <?php if ($class['calories_burned_avg']): ?>
-                                <div><i class="fas fa-fire text-danger"></i> ~<?= $class['calories_burned_avg'] ?> calories</div>
-                            <?php endif; ?>
+                           
                         </div>
                         
                         <a href="class-detail.php?id=<?= $class['class_id'] ?>" class="btn btn-primary btn-block">

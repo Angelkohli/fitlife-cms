@@ -3,6 +3,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+if (!defined('BASE_URL')) {
+    require_once __DIR__ . '/../config/config.php';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,25 +58,25 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php if (isset($is_admin) && $is_admin): ?>
                         <!-- Admin Navigation -->
                         <li class="nav-item">
-                            <a class="nav-link" href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                            <a class="nav-link" href="<?php echo BASE_URL; ?>/admin/index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="classes/index.php"><i class="fas fa-calendar"></i> Classes</a>
+                            <a class="nav-link" href="<?php echo BASE_URL; ?>/admin/classes/index.php"><i class="fas fa-calendar"></i> Classes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="categories/index.php"><i class="fas fa-tags"></i> Categories</a>
+                            <a class="nav-link" href="<?php echo BASE_URL; ?>/admin/categories/index.php"><i class="fas fa-tags"></i> Categories</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="reviews/index.php"><i class="fas fa-comments"></i> Reviews</a>
+                            <a class="nav-link" href="<?php echo BASE_URL; ?>/admin/reviews/index.php"><i class="fas fa-comments"></i> Reviews</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="users/index.php"><i class="fas fa-users"></i> Users</a>
+                            <a class="nav-link" href="<?php echo BASE_URL; ?>/admin/users/index.php"><i class="fas fa-users"></i> Users</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="../public/index.php"><i class="fas fa-eye"></i> View Site</a>
+                            <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php"><i class="fas fa-eye"></i> View Site</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-warning" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            <a class="nav-link text-warning" href="<?php echo BASE_URL; ?>/admin/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
                         </li>
                     <?php else: ?>
                         <!-- Public Navigation -->
@@ -92,7 +96,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                 </span>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-warning" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                                <a class="nav-link text-warning" href="<?php echo BASE_URL; ?>/admin/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
                             </li>
                         <?php else: ?>
                             <li class="nav-item">

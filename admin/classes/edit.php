@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle image operations (Feature 6.1 & 6.2)
     $new_image_path = $class['instructor_image_path'];
 
-    // Delete existing image if requested
+    // Delete existing image if requested (Feature 6.2)
     if (isset($_POST['delete_image']) && $class['instructor_image_path']) {
         deleteInstructorImage($class['instructor_image_path']);
         $new_image_path = null;
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['instructor_image']) && $_FILES['instructor_image']['error'] !== UPLOAD_ERR_NO_FILE) {
         $upload_result = uploadInstructorImage($_FILES['instructor_image']);
         if ($upload_result['success']) {
-            // Delete old image if exists
+            // Delete old image if exists (Feature 6.2)
             if ($class['instructor_image_path']) {
                 deleteInstructorImage($class['instructor_image_path']);
             }
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 category_id = :category_id,
                 is_active = :is_active,
                 is_featured = :is_featured,
-                slug = :slug
+                slug = :slug,
                 instructor_image_path = :instructor_image_path
                 WHERE class_id = :class_id";
             

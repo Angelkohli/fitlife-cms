@@ -4,6 +4,8 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
 
+require_once '../includes/captcha.php';
+
 $pdo = getDBConnection();
 $css_path = '../assets/css/style.css';
 $js_path = '../assets/js/main.js';
@@ -67,7 +69,7 @@ include '../includes/header.php';
     <div class="col-lg-8 mb-4">
         <div class="card">
             <?php if ($class['instructor_image_path']): ?>
-                <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                <img src="../admin/uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                      class="card-img-top" 
                      alt="<?= sanitizeString($class['instructor_name']) ?>"
                      style="max-height: 400px; object-fit: cover;">
@@ -80,9 +82,7 @@ include '../includes/header.php';
                             <?= sanitizeString($class['category_name']) ?>
                         </span>
                     <?php endif; ?>
-                    <span class="badge badge-<?= getDifficultyBadgeColor($class['difficulty_level']) ?> badge-lg">
-                        <?= $class['difficulty_level'] ?>
-                    </span>
+                    
                     <?php if ($class['is_featured']): ?>
                         <span class="badge badge-warning badge-lg">
                             <i class="fas fa-star"></i> Featured
@@ -111,12 +111,7 @@ include '../includes/header.php';
                 
                 <p class="lead"><?= nl2br(sanitizeString($class['class_description'])) ?></p>
                 
-                <?php if ($class['equipment_needed']): ?>
-                    <div class="alert alert-info">
-                        <strong><i class="fas fa-toolbox"></i> Equipment Needed:</strong> 
-                        <?= sanitizeString($class['equipment_needed']) ?>
-                    </div>
-                <?php endif; ?>
+                
             </div>
         </div>
         
@@ -233,7 +228,7 @@ include '../includes/header.php';
                 <?php endif; ?>
                 
                 <?php if (!$comment_success): ?>
-                    <form method="POST" action="#comment-form" >
+                    <form method="POST" action="#comment-form">
                         <div class="form-group">
                             <label for="member_name">Your Name *</label>
                             <input type="text" 
@@ -308,6 +303,7 @@ include '../includes/header.php';
     
     <!-- Sidebar -->
     <div class="col-lg-4">
+    
         
         <!-- Instructor Card -->
         <div class="card mb-4">
@@ -316,7 +312,7 @@ include '../includes/header.php';
             </div>
             <div class="card-body text-center">
                 <?php if ($class['instructor_image_path']): ?>
-                    <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                    <img src="../admin/uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                          class="rounded-circle mb-3" 
                          alt="<?= sanitizeString($class['instructor_name']) ?>"
                          style="width: 120px; height: 120px; object-fit: cover;">

@@ -125,9 +125,6 @@ include '../../includes/header.php';
                                 <td>
                                     <strong><?= sanitizeString($class['class_name']) ?></strong>
                                     <br>
-                                    <span class="badge badge-<?= getDifficultyBadgeColor($class['difficulty_level']) ?>">
-                                        <?= $class['difficulty_level'] ?>
-                                    </span>
                                 </td>
                                 <td><?= sanitizeString($class['instructor_name']) ?></td>
                                 <td>

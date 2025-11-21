@@ -10,16 +10,27 @@ $css_path = '../assets/css/style.css';
 $js_path = '../assets/js/main.js';
 
 $search_query = '';
+$category_filter = '';
 $results = [];
 $searched = false;
+
+// Pagination settings (Feature 3.3 - 5 marks)
+$results_per_page = 6; // Easy to change for testing
+$current_page = sanitizeID($_GET['page'] ?? 1);
+if ($current_page < 1) $current_page = 1;
+
+// Fetch all categories for dropdown
+$stmt = $pdo->query("SELECT * FROM categories ORDER BY category_name");
+$categories = $stmt->fetchAll();
 
 // Handle search
 if (isset($_GET['q'])) {
     $search_query = sanitizeString($_GET['q'] ?? '');
+    $category_filter = sanitizeID($_GET['category'] ?? 0);
     $searched = true;
     
     if (!empty($search_query)) {
-        // Search in class name, description, instructor name, equipment
+        // Build query with optional category filter (Feature 3.2 - 5 marks)
         $sql = "
             SELECT c.*, cat.category_name, cat.color_code
             FROM classes c
@@ -29,18 +40,28 @@ if (isset($_GET['q'])) {
                 c.class_name LIKE :query1 
                 OR c.class_description LIKE :query2 
                 OR c.instructor_name LIKE :query3
-                OR c.equipment_needed LIKE :query4
             )
-            ORDER BY c.class_name
         ";
 
+        // Add category filter if selected
+        if ($category_filter) {
+            $sql .= " AND c.category_id = :category_id";
+        }
+        
+        $sql .= " ORDER BY c.class_name";
+
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([
+         $params = ([
             ':query1' => '%' . $search_query . '%',
             ':query2' => '%' . $search_query . '%',
-            ':query3' => '%' . $search_query . '%',
-            ':query4' => '%' . $search_query . '%'
+            ':query3' => '%' . $search_query . '%'
         ]);
+        
+        if ($category_filter) {
+            $params[':category_id'] = $category_filter;
+        }
+        
+        $stmt->execute($params);
         $results = $stmt->fetchAll();
     }
 }
@@ -122,9 +143,7 @@ include '../includes/header.php';
                                             <?= sanitizeString($class['category_name']) ?>
                                         </span>
                                     <?php endif; ?>
-                                    <span class="badge badge-<?= getDifficultyBadgeColor($class['difficulty_level']) ?>">
-                                        <?= $class['difficulty_level'] ?>
-                                    </span>
+                                    
                                     <?php if ($class['is_featured']): ?>
                                         <span class="badge badge-warning">
                                             <i class="fas fa-star"></i> Featured
@@ -140,9 +159,6 @@ include '../includes/header.php';
                                 
                                 <div class="small text-muted mb-3">
                                     <div><i class="fas fa-user"></i> <?= sanitizeString($class['instructor_name']) ?></div>
-                                    <div><i class="fas fa-calendar-day"></i> <?= $class['day_of_week'] ?>s at <?= formatTime($class['start_time']) ?></div>
-                                    <div><i class="fas fa-map-marker-alt"></i> <?= $class['class_location'] ?></div>
-                                    <div><i class="fas fa-clock"></i> <?= $class['duration_minutes'] ?> minutes</div>
                                 </div>
                                 
                                 <a href="class-detail.php?id=<?= $class['class_id'] ?>" class="btn btn-primary btn-block">

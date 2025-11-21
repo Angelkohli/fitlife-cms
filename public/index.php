@@ -15,7 +15,6 @@ $stmt = $pdo->query("
     FROM classes c
     LEFT JOIN categories cat ON c.category_id = cat.category_id
     WHERE c.is_active = 1 AND c.is_featured = 1
-    ORDER BY c.day_of_week, c.start_time
     LIMIT 6
 ");
 $featured_classes = $stmt->fetchAll();
@@ -115,9 +114,6 @@ include '../includes/header.php';
                                     <?= sanitizeString($class['category_name']) ?>
                                 </span>
                             <?php endif; ?>
-                            <span class="badge badge-<?= getDifficultyBadgeColor($class['difficulty_level']) ?>">
-                                <?= $class['difficulty_level'] ?>
-                            </span>
                         </div>
                         
                         <h5 class="card-title"><?= sanitizeString($class['class_name']) ?></h5>
@@ -128,12 +124,6 @@ include '../includes/header.php';
                         
                         <div class="small text-muted mb-3">
                             <div><i class="fas fa-user"></i> <?= sanitizeString($class['instructor_name']) ?></div>
-                            <div><i class="fas fa-calendar-day"></i> <?= $class['day_of_week'] ?>s at <?= formatTime($class['start_time']) ?></div>
-                            <div><i class="fas fa-map-marker-alt"></i> <?= $class['class_location'] ?></div>
-                            <div><i class="fas fa-clock"></i> <?= $class['duration_minutes'] ?> minutes</div>
-                            <?php if ($class['calories_burned_avg']): ?>
-                                <div><i class="fas fa-fire"></i> ~<?= $class['calories_burned_avg'] ?> calories</div>
-                            <?php endif; ?>
                         </div>
                         
                         <a href="class-detail.php?id=<?= $class['class_id'] ?>" class="btn btn-primary btn-block">

@@ -57,10 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $sql = "INSERT INTO classes (
                 class_name, class_description, instructor_name,
-                category_id, is_active, is_featured
+                category_id, is_active, is_featured, instructor_image_path, slug
             ) VALUES (
                 :class_name, :class_description, :instructor_name,
-                :category_id, :is_active, :is_featured
+                :category_id, :is_active, :is_featured, :instructor_image_path, :slug
             )";
             
             $stmt = $pdo->prepare($sql);
@@ -70,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':instructor_name' => $form_data['instructor_name'],
                 ':category_id' => $form_data['category_id'],
                 ':is_active' => $form_data['is_active'],
-                ':is_featured' => $form_data['is_featured']
+                ':is_featured' => $form_data['is_featured'],
+                ':instructor_image_path' => $uploaded_image,
+                ':slug' => $slug
             ]);
             
             setFlashMessage('Class created successfully!', 'success');

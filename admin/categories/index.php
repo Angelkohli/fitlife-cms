@@ -51,7 +51,6 @@ include '../../includes/header.php';
                             <th width="60">Icon</th>
                             <th>Category Name</th>
                             <th>Description</th>
-                            <th width="100">Color</th>
                             <th width="80">Order</th>
                             <th width="100">Classes</th>
                             <th width="80">Created</th>
@@ -71,11 +70,6 @@ include '../../includes/header.php';
                                 </td>
                                 <td>
                                     <small><?= truncateText($category['category_description'], 80) ?></small>
-                                </td>
-                                <td>
-                                    <span class="badge" style="background-color: <?= sanitizeString($category['color_code']) ?>; color: white;">
-                                        <?= sanitizeString($category['color_code']) ?>
-                                    </span>
                                 </td>
                                 <td class="text-center">
                                     <?= $category['display_order'] ?>
