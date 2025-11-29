@@ -18,6 +18,7 @@ $searched = false;
 $results_per_page = 6; // Easy to change for testing
 $current_page = sanitizeID($_GET['page'] ?? 1);
 if ($current_page < 1) $current_page = 1;
+$offset = ($current_page - 1) * $results_per_page;
 
 // Fetch all categories for dropdown
 $stmt = $pdo->query("SELECT * FROM categories ORDER BY category_name");
@@ -50,18 +51,45 @@ if (isset($_GET['q'])) {
         
         $sql .= " ORDER BY c.class_name";
 
-        $stmt = $pdo->prepare($sql);
-         $params = ([
+        // First, get total count for pagination
+        $count_sql = "SELECT COUNT(*) as total FROM ($sql) AS count_table";
+        $stmt = $pdo->prepare($count_sql);
+        $params = [
             ':query1' => '%' . $search_query . '%',
             ':query2' => '%' . $search_query . '%',
             ':query3' => '%' . $search_query . '%'
-        ]);
+        ];
         
         if ($category_filter) {
             $params[':category_id'] = $category_filter;
         }
         
         $stmt->execute($params);
+        $total_results = $stmt->fetchColumn();
+        $total_pages = ceil($total_results / $results_per_page);
+
+        // Adjust current page if out of bounds
+        if ($current_page > $total_pages && $total_pages > 0) {
+            $current_page = $total_pages;
+        }
+
+        // Now get the actual results with pagination
+        $sql .= " LIMIT :limit OFFSET :offset";
+        $stmt = $pdo->prepare($sql);
+        
+        $params[':limit'] = $results_per_page;
+        $params[':offset'] = $offset;
+        
+        // Bind parameters
+        foreach ($params as $key => $value) {
+            if ($key === ':limit' || $key === ':offset') {
+                $stmt->bindValue($key, $value, PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue($key, $value);
+            }
+        }
+        
+        $stmt->execute();
         $results = $stmt->fetchAll();
     }
 }
@@ -80,15 +108,33 @@ include '../includes/header.php';
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="search.php" class="form-inline">
-            <div class="input-group w-100">
-                <input type="text" 
-                       class="form-control form-control-lg" 
-                       name="q" 
-                       placeholder="Search by class name, instructor, or description..."
-                       value="<?= htmlspecialchars($search_query) ?>"
-                       autofocus>
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary btn-lg">
+            <div class="form-row w-100 align-items-end">
+                <div class="col-md-6 mb-2">
+                    <label for="q" class="form-label"><strong>Search Keywords</strong></label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="q" 
+                           id="q"
+                           placeholder="Search by class name, instructor, or description..."
+                           value="<?= htmlspecialchars($search_query) ?>"
+                           autofocus>
+                </div>
+                
+                <div class="col-md-4 mb-2">
+                    <label for="category" class="form-label"><strong>Filter by Category</strong></label>
+                    <select class="form-control" name="category" id="category">
+                        <option value="">All Categories</option>
+                        <?php foreach ($categories as $category): ?>
+                            <option value="<?= $category['category_id'] ?>" 
+                                <?= ($category_filter == $category['category_id']) ? 'selected' : '' ?>>
+                                <?= sanitizeString($category['category_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 mb-2">
+                    <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-search"></i> Search
                     </button>
                 </div>
@@ -111,8 +157,8 @@ include '../includes/header.php';
     <?php if (!empty($search_query)): ?>
         <div class="alert alert-info">
             <i class="fas fa-info-circle"></i> 
-            <?php if (count($results) > 0): ?>
-                Found <strong><?= count($results) ?></strong> class<?= count($results) !== 1 ? 'es' : '' ?> 
+            <?php if (isset($total_results) && $total_results > 0): ?>
+                Found <strong><?= $total_results ?></strong> class<?= $total_results !== 1 ? 'es' : '' ?> 
                 matching "<strong><?= htmlspecialchars($search_query) ?></strong>"
             <?php else: ?>
                 No classes found matching "<strong><?= htmlspecialchars($search_query) ?></strong>"
@@ -125,7 +171,7 @@ include '../includes/header.php';
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow-sm" style="border-top: 4px solid <?= $class['color_code'] ?? '#007bff' ?>">
                             <?php if ($class['instructor_image_path']): ?>
-                                <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                                <img src="../admin/uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                                      class="card-img-top" 
                                      alt="<?= sanitizeString($class['instructor_name']) ?>"
                                      style="height: 200px; object-fit: cover;">
@@ -169,6 +215,49 @@ include '../includes/header.php';
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Pagination (Feature 3.3 - 5 marks) -->
+            <?php if ($total_pages > 1): ?>
+                <nav aria-label="Search results pagination">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous Page Link -->
+                        <li class="page-item <?= $current_page <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" 
+                               href="?q=<?= urlencode($search_query) ?>&category=<?= $category_filter ?>&page=<?= $current_page - 1 ?>" 
+                               aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+
+                        <!-- Page Number Links -->
+                        <?php for ($page = 1; $page <= $total_pages; $page++): ?>
+                            <li class="page-item <?= $page == $current_page ? 'active' : '' ?>">
+                                <a class="page-link" 
+                                   href="?q=<?= urlencode($search_query) ?>&category=<?= $category_filter ?>&page=<?= $page ?>">
+                                    <?= $page ?>
+                                </a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <!-- Next Page Link -->
+                        <li class="page-item <?= $current_page >= $total_pages ? 'disabled' : '' ?>">
+                            <a class="page-link" 
+                               href="?q=<?= urlencode($search_query) ?>&category=<?= $category_filter ?>&page=<?= $current_page + 1 ?>" 
+                               aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="text-center text-muted small mt-2">
+                    Page <?= $current_page ?> of <?= $total_pages ?> 
+                    (Showing <?= count($results) ?> of <?= $total_results ?> classes)
+                </div>
+            <?php endif; ?>
+
         <?php else: ?>
             <div class="card">
                 <div class="card-body text-center py-5">
@@ -207,10 +296,9 @@ include '../includes/header.php';
             <div class="card h-100">
                 <div class="card-body text-center">
                     <i class="fas fa-filter fa-3x text-primary mb-3"></i>
-                    <h5>Browse by Category</h5>
+                    <h5>Filter by Category</h5>
                     <p class="text-muted small">
-                        Looking for a specific type of class? 
-                        <a href="index.php">Browse by category</a> to see all yoga, cardio, or strength classes.
+                        Use the category dropdown to narrow your search to specific types of classes like Yoga, Cardio, or Strength Training.
                     </p>
                 </div>
             </div>
