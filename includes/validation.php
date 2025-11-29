@@ -6,8 +6,6 @@
 
 /**
  * Sanitize and validate an ID (Feature 4.2)
- * @param mixed $id The ID to validate
- * @return int|false Returns sanitized ID or false if invalid
  */
 function sanitizeID($id) {
     $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -16,8 +14,6 @@ function sanitizeID($id) {
 
 /**
  * Sanitize string to prevent XSS attacks (Feature 4.3)
- * @param string $string The string to sanitize
- * @return string Sanitized string
  */
 function sanitizeString($string) {
     return htmlspecialchars(trim($string), ENT_QUOTES, 'UTF-8');

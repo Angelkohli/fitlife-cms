@@ -13,9 +13,6 @@ function isGDAvailable() {
 
 /**
  * Upload instructor image
- * @param array $file $_FILES array element
- * @param string $upload_dir Upload directory path
- * @return array ['success' => bool, 'filename' => string, 'error' => string]
  */
 function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
     $result = [
@@ -71,7 +68,11 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
     if (move_uploaded_file($file['tmp_name'], $target_path)) {
         // Auto-resize image only if GD is available (Feature 6.3 - 5 marks)
         if (isGDAvailable()) {
-            resizeImage($target_path, 800, 600);
+            $resize_result = resizeImage($target_path, 800, 600);
+            if (!$resize_result) {
+                error_log("Image resize failed for: " . $filename);
+                // Continue anyway - the upload was successful
+            }
         } else {
             error_log("GD extension not available - image uploaded but not resized");
             // You might want to show a warning to the admin
@@ -88,21 +89,12 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
 
 /**
  * Resize image to maximum dimensions (Feature 6.3)
- * @param string $file_path Path to image file
- * @param int $max_width Maximum width
- * @param int $max_height Maximum height
- * @return bool Success status
  */
 function resizeImage($file_path, $max_width = 800, $max_height = 600) {
-    // Check if GD is available
-    if (!isGDAvailable()) {
-        error_log("GD extension not available - cannot resize image");
-        return false;
-    }
-    
     // Get image info
     $image_info = getimagesize($file_path);
     if ($image_info === false) {
+        error_log("Cannot get image size for: " . $file_path);
         return false;
     }
     
@@ -113,12 +105,21 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
         return true; // No resize needed
     }
     
-    // Calculate new dimensions
-    $ratio = min($max_width / $orig_width, $max_height / $orig_height);
-    $new_width = round($orig_width * $ratio);
-    $new_height = round($orig_height * $ratio);
+    // Calculate new dimensions while maintaining aspect ratio
+    $ratio = $orig_width / $orig_height;
     
-    // Create image resource from file
+    if ($max_width / $max_height > $ratio) {
+        $new_width = $max_height * $ratio;
+        $new_height = $max_height;
+    } else {
+        $new_width = $max_width;
+        $new_height = $max_width / $ratio;
+    }
+    
+    $new_width = round($new_width);
+    $new_height = round($new_height);
+    
+    // Create image resource from file based on image type
     switch ($image_type) {
         case IMAGETYPE_JPEG:
             $source = imagecreatefromjpeg($file_path);
@@ -130,44 +131,70 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
             $source = imagecreatefromgif($file_path);
             break;
         case IMAGETYPE_WEBP:
-            $source = imagecreatefromwebp($file_path);
+            if (function_exists('imagecreatefromwebp')) {
+                $source = imagecreatefromwebp($file_path);
+            } else {
+                error_log("WebP not supported in this GD installation");
+                return false;
+            }
             break;
         default:
+            error_log("Unsupported image type: " . $image_type);
             return false;
     }
     
-    if ($source === false) {
+    if (!$source) {
+        error_log("Failed to create image resource from: " . $file_path);
         return false;
     }
     
-    // Create new image
+    // Create new image resource for resized version
     $resized = imagecreatetruecolor($new_width, $new_height);
+    if (!$resized) {
+        error_log("Failed to create true color image");
+        imagedestroy($source);
+        return false;
+    }
     
     // Preserve transparency for PNG and GIF
     if ($image_type == IMAGETYPE_PNG || $image_type == IMAGETYPE_GIF) {
+        imagecolortransparent($resized, imagecolorallocatealpha($resized, 0, 0, 0, 127));
         imagealphablending($resized, false);
         imagesavealpha($resized, true);
-        $transparent = imagecolorallocatealpha($resized, 255, 255, 255, 127);
-        imagefilledrectangle($resized, 0, 0, $new_width, $new_height, $transparent);
+        
+        // For GIF, handle transparency
+        if ($image_type == IMAGETYPE_GIF) {
+            $transparent_index = imagecolortransparent($source);
+            if ($transparent_index >= 0) {
+                $transparent_color = imagecolorsforindex($source, $transparent_index);
+                $transparent_index = imagecolorallocatealpha($resized, $transparent_color['red'], $transparent_color['green'], $transparent_color['blue'], 127);
+                imagefill($resized, 0, 0, $transparent_index);
+                imagecolortransparent($resized, $transparent_index);
+            }
+        }
     }
     
-    // Resize
+    // Resize the image with better quality
     imagecopyresampled($resized, $source, 0, 0, 0, 0, $new_width, $new_height, $orig_width, $orig_height);
     
-    // Save resized image
-    $result = false;
+    // Save resized image back to file
+    $success = false;
     switch ($image_type) {
         case IMAGETYPE_JPEG:
-            $result = imagejpeg($resized, $file_path, 90);
+            $success = imagejpeg($resized, $file_path, 85); // 85% quality
             break;
         case IMAGETYPE_PNG:
-            $result = imagepng($resized, $file_path, 9);
+            $success = imagepng($resized, $file_path, 8); // Compression level 8 (0-9)
             break;
         case IMAGETYPE_GIF:
-            $result = imagegif($resized, $file_path);
+            $success = imagegif($resized, $file_path);
             break;
         case IMAGETYPE_WEBP:
-            $result = imagewebp($resized, $file_path, 90);
+            if (function_exists('imagewebp')) {
+                $success = imagewebp($resized, $file_path, 85); // 85% quality
+            } else {
+                $success = false;
+            }
             break;
     }
     
@@ -175,16 +202,16 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
     imagedestroy($source);
     imagedestroy($resized);
     
-    return $result;
+    if (!$success) {
+        error_log("Failed to save resized image: " . $file_path);
+        return false;
+    }
+    
+    return true;
 }
-
-// ... rest of your existing functions remain the same ...
 
 /**
  * Delete instructor image
- * @param string $filename Image filename
- * @param string $upload_dir Upload directory path
- * @return bool Success status
  */
 function deleteInstructorImage($filename, $upload_dir = '../uploads/instructors/') {
     if (empty($filename)) {
@@ -202,8 +229,6 @@ function deleteInstructorImage($filename, $upload_dir = '../uploads/instructors/
 
 /**
  * Validate image file before upload
- * @param array $file $_FILES array element
- * @return array ['valid' => bool, 'error' => string]
  */
 function validateImageFile($file) {
     $result = ['valid' => false, 'error' => ''];
@@ -236,8 +261,6 @@ function validateImageFile($file) {
 
 /**
  * Get image dimensions
- * @param string $file_path Path to image file
- * @return array|false ['width' => int, 'height' => int, 'type' => string]
  */
 function getImageInfo($file_path) {
     if (!file_exists($file_path)) {

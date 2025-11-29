@@ -16,7 +16,7 @@ if (!defined('BASE_URL')) {
     <title><?= isset($page_title) ? $page_title . ' - ' : '' ?>FitLife Winnipeg CMS</title>
     
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -95,6 +95,9 @@ if (!defined('BASE_URL')) {
                                     <i class="fas fa-user"></i> <?= sanitizeString($_SESSION['full_name'] ?? $_SESSION['username']) ?>
                                     <?php if (isAdmin()): ?>
                                         <span class="badge badge-warning ml-1">Admin</span>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="<?php echo BASE_URL; ?>/admin/index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                                        </li>
                                     <?php endif; ?>
                                 </span>
                             </li>
