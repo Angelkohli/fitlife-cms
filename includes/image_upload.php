@@ -4,9 +4,7 @@
  * Handles instructor image uploads with validation
  */
 
-/**
- * Check if GD extension is available for image processing
- */
+
 function isGDAvailable() {
     return extension_loaded('gd') && function_exists('imagecreatefromjpeg');
 }

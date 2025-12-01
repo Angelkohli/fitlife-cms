@@ -10,6 +10,12 @@ $pdo = getDBConnection();
 $css_path = '../assets/css/style.css';
 $js_path = '../assets/js/main.js';
 
+// Initialize session and check if user is logged in
+initSession();
+$is_logged_in = isLoggedIn();
+$current_user_name = $is_logged_in ? $_SESSION['full_name'] : '';
+$current_user_id = $is_logged_in ? $_SESSION['user_id'] : null;
+
 // Get and validate class ID
 $class_id = sanitizeID($_GET['id'] ?? 0);
 
@@ -169,9 +175,12 @@ include '../includes/header.php';
                 $comment_success = false;
                 
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
+                    // Use logged-in user's name or form input for anonymous users
+                    $member_name = $is_logged_in ? $current_user_name : sanitizeString($_POST['member_name'] ?? '');
+                    
                     // Sanitize input
                     $comment_data = [
-                        'member_name' => sanitizeString($_POST['member_name'] ?? ''),
+                        'member_name' => $member_name,
                         'review_text' => sanitizeString($_POST['review_text'] ?? ''),
                         'review_rating' => sanitizeID($_POST['review_rating'] ?? 0)
                     ];
@@ -229,15 +238,28 @@ include '../includes/header.php';
                 
                 <?php if (!$comment_success): ?>
                     <form method="POST" action="#comment-form">
-                        <div class="form-group">
-                            <label for="member_name">Your Name *</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="member_name" 
-                                   name="member_name"
-                                   value="<?= isset($comment_data) ? $comment_data['member_name'] : '' ?>"
-                                   required>
-                        </div>
+                        <?php if ($is_logged_in): ?>
+                            <!-- Logged in user - show their name -->
+                            <div class="form-group">
+                                <label>Your Name</label>
+                                <p class="form-control-plaintext font-weight-bold">
+                                    <i class="fas fa-user-check text-success"></i> 
+                                    <?= sanitizeString($current_user_name) ?>
+                                </p>
+                                <input type="hidden" name="member_name" value="<?= sanitizeString($current_user_name) ?>">
+                            </div>
+                        <?php else: ?>
+                            <!-- Not logged in - show name input field -->
+                            <div class="form-group">
+                                <label for="member_name">Your Name *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="member_name" 
+                                       name="member_name"
+                                       value="<?= isset($comment_data) ? $comment_data['member_name'] : '' ?>"
+                                       required>
+                            </div>
+                        <?php endif; ?>
                         
                         <div class="form-group">
                             <label for="review_rating">Rating *</label>

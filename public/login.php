@@ -132,7 +132,7 @@ $page_title = "Login";
                 <form method="POST" action="">
                     <div class="form-group">
                         <label for="username">
-                            <i class="fas fa-user"></i> Username or Email
+                            <i class="fas fa-user"></i> Username
                         </label>
                         <input type="text" 
                                class="form-control form-control-lg" 

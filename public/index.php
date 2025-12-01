@@ -9,15 +9,32 @@ $page_title = "Home";
 $css_path = '../assets/css/style.css';
 $js_path = '../assets/js/main.js';
 
-// Fetch featured classes
-$stmt = $pdo->query("
-    SELECT c.*, cat.category_name, cat.color_code
-    FROM classes c
-    LEFT JOIN categories cat ON c.category_id = cat.category_id
-    WHERE c.is_active = 1 AND c.is_featured = 1
-    LIMIT 6
-");
-$featured_classes = $stmt->fetchAll();
+// Check if a category filter is selected
+$selected_category = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+
+// Fetch featured classes (filtered by category if selected)
+if ($selected_category > 0) {
+    $stmt = $pdo->prepare("
+        SELECT c.*, cat.category_name, cat.color_code
+        FROM classes c
+        LEFT JOIN categories cat ON c.category_id = cat.category_id
+        WHERE c.is_active = 1 
+        AND c.category_id = ?
+        ORDER BY c.class_name
+        LIMIT 12
+    ");
+    $stmt->execute([$selected_category]);
+    $featured_classes = $stmt->fetchAll();
+} else {
+    $stmt = $pdo->query("
+        SELECT c.*, cat.category_name, cat.color_code
+        FROM classes c
+        LEFT JOIN categories cat ON c.category_id = cat.category_id
+        WHERE c.is_active = 1 AND c.is_featured = 1
+        LIMIT 6
+    ");
+    $featured_classes = $stmt->fetchAll();
+}
 
 // Fetch all categories with class count
 $stmt = $pdo->query("
@@ -32,6 +49,17 @@ $categories = $stmt->fetchAll();
 // Get total active classes
 $stmt = $pdo->query("SELECT COUNT(*) as total FROM classes WHERE is_active = 1");
 $total_classes = $stmt->fetch()['total'];
+
+// Get selected category name for display
+$selected_category_name = "All Categories";
+if ($selected_category > 0) {
+    foreach ($categories as $cat) {
+        if ($cat['category_id'] == $selected_category) {
+            $selected_category_name = sanitizeString($cat['category_name']);
+            break;
+        }
+    }
+}
 
 include '../includes/header.php';
 ?>
@@ -54,6 +82,50 @@ include '../includes/header.php';
         <a href="search.php" class="btn btn-outline-light btn-lg">
             <i class="fas fa-search"></i> Search Classes
         </a>
+    </div>
+</div>
+
+<!-- Category Filter Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-3">
+                    <i class="fas fa-filter"></i> Filter Classes
+                </h2>
+                <form method="GET" action="" class="form-inline">
+                    <div class="form-group mr-3">
+                        <label for="category" class="mr-2"><strong>Select Category:</strong></label>
+                        <select name="category" id="category" class="form-control" onchange="this.form.submit()">
+                            <option value="0" <?= $selected_category == 0 ? 'selected' : '' ?>>All Categories</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category['category_id'] ?>" 
+                                    <?= $selected_category == $category['category_id'] ? 'selected' : '' ?>
+                                    style="color: <?= $category['color_code'] ?>">
+                                    <?= sanitizeString($category['category_name']) ?> 
+                                    (<?= $category['class_count'] ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php if ($selected_category > 0): ?>
+                        <a href="index.php" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Clear Filter
+                        </a>
+                    <?php endif; ?>
+                </form>
+                
+                <?php if ($selected_category > 0): ?>
+                    <div class="mt-3 alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Showing classes in category: <strong><?= $selected_category_name ?></strong>
+                        <a href="category.php?id=<?= $selected_category ?>" class="btn btn-sm btn-info ml-2">
+                            View Category Details
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -82,16 +154,24 @@ include '../includes/header.php';
     <?php endforeach; ?>
 </div>
 
-<!-- Featured Classes -->
-<?php if (count($featured_classes) > 0): ?>
-    <div class="row mb-4">
-        <div class="col-12">
+<!-- Classes Display Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <?php if ($selected_category > 0): ?>
+            <h2 class="mb-4">
+                <i class="fas <?= getCategoryIconById($categories, $selected_category) ?>" 
+                   style="color: <?= getCategoryColorById($categories, $selected_category) ?>"></i>
+                <?= $selected_category_name ?> Classes
+            </h2>
+        <?php else: ?>
             <h2 class="mb-4">
                 <i class="fas fa-star text-warning"></i> Featured Classes
             </h2>
-        </div>
+        <?php endif; ?>
     </div>
-    
+</div>
+
+<?php if (count($featured_classes) > 0): ?>
     <div class="row">
         <?php foreach ($featured_classes as $class): ?>
             <div class="col-md-6 col-lg-4 mb-4">
@@ -110,7 +190,7 @@ include '../includes/header.php';
                     <div class="card-body">
                         <div class="mb-2">
                             <?php if ($class['category_name']): ?>
-                                <span class="badge badge-info">
+                                <span class="badge badge-info" style="background-color: <?= $class['color_code'] ?>">
                                     <?= sanitizeString($class['category_name']) ?>
                                 </span>
                             <?php endif; ?>
@@ -136,8 +216,25 @@ include '../includes/header.php';
     </div>
     
     <div class="text-center mb-5">
-        <a href="classes.php" class="btn btn-outline-primary btn-lg">
-            <i class="fas fa-th"></i> View All Classes
+        <?php if ($selected_category > 0): ?>
+            <a href="classes.php?category=<?= $selected_category ?>" class="btn btn-primary btn-lg mr-2">
+                <i class="fas fa-th"></i> View All <?= $selected_category_name ?> Classes
+            </a>
+            <a href="index.php" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-star"></i> Back to Featured Classes
+            </a>
+        <?php else: ?>
+            <a href="classes.php" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-th"></i> View All Classes
+            </a>
+        <?php endif; ?>
+    </div>
+<?php else: ?>
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> 
+        No classes found in this category. Please try another category or view all classes.
+        <a href="classes.php" class="btn btn-outline-warning btn-sm ml-2">
+            Browse All Classes
         </a>
     </div>
 <?php endif; ?>
@@ -182,3 +279,25 @@ include '../includes/header.php';
 </div>
 
 <?php include '../includes/footer.php'; ?>
+
+<?php
+// Helper function to get category icon by ID
+function getCategoryIconById($categories, $category_id) {
+    foreach ($categories as $cat) {
+        if ($cat['category_id'] == $category_id) {
+            return $cat['category_icon'];
+        }
+    }
+    return 'fa-tag';
+}
+
+// Helper function to get category color by ID
+function getCategoryColorById($categories, $category_id) {
+    foreach ($categories as $cat) {
+        if ($cat['category_id'] == $category_id) {
+            return $cat['color_code'];
+        }
+    }
+    return '#007bff';
+}
+?>
