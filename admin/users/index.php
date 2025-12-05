@@ -1,5 +1,5 @@
 <?php
-// Admin - User Management (Feature 7.2 - 5 marks)
+//User Management (Feature 7.2)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -41,7 +41,7 @@ include '../../includes/header.php';
     </div>
 </div>
 
-<!-- Stats Cards -->
+<!-- Stats-->
 <div class="row mb-4">
     <div class="col-md-6 mb-3">
         <div class="card bg-danger text-white">

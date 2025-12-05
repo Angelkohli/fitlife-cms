@@ -1,5 +1,5 @@
 <?php
-// Admin - Edit Category (Feature 2.4 - Part of 5 marks)
+// Admin - Edit(2.4)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -24,7 +24,7 @@ if (!$category_id) {
     exit;
 }
 
-// Fetch category
+// Fetching category
 $stmt = $pdo->prepare("SELECT * FROM categories WHERE category_id = :id");
 $stmt->execute([':id' => $category_id]);
 $category = $stmt->fetch();
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Category description is required";
     }
     
-    // Check for duplicate (excluding current category)
+    // Check for duplicate
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM categories WHERE category_name = :name AND category_id != :id");
     $stmt->execute([':name' => $form_data['category_name'], ':id' => $category_id]);
     if ($stmt->fetchColumn() > 0) {

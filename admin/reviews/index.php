@@ -1,5 +1,5 @@
 <?php
-// Admin - Moderate Reviews (Feature 2.5 - 5 marks)
+//  Moderate Reviews (2.5)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -15,14 +15,14 @@ $page_title = "Moderate Reviews";
 $is_admin = true;
 $css_path = '../../assets/css/style.css';
 
-// Filter by approval status
+// approval 
 $filter = sanitizeString($_GET['filter'] ?? 'pending');
 $allowed_filters = ['all', 'pending', 'approved'];
 if (!in_array($filter, $allowed_filters)) {
     $filter = 'pending';
 }
 
-// Build query based on filter
+//query for filter
 $sql = "
     SELECT r.*, c.class_name, c.class_id
     FROM reviews r
@@ -63,7 +63,7 @@ include '../../includes/header.php';
     </div>
 </div>
 
-<!-- Filter Tabs -->
+<!-- Filter -->
 <div class="card mb-3">
     <div class="card-body">
         <div class="btn-group" role="group">

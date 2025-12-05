@@ -1,5 +1,5 @@
 <?php
-// Admin - Review Moderation Actions (Feature 2.5)
+// Reviewing moderate comments (2.5)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';

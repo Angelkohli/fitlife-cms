@@ -17,7 +17,7 @@ $(document).ready(function() {
         }
     });
     
-    // Smooth scroll to anchor links
+    // Smooth scroll anchor links
     $('a[href^="#"]').on('click', function(e) {
         var target = $(this.getAttribute('href'));
         if(target.length) {

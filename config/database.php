@@ -1,24 +1,23 @@
 <?php
 /**
- * Database Configuration for FitLife CMS
- * Uses PDO for secure database operations
+ * Database Configuration
  */
 
-// Database credentials - UPDATE THESE WITH YOUR INFO
+// Database credentials 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'fitlife_cms');  // Change to your database name
-define('DB_USER', 'root');          // Change to your MySQL username
-define('DB_PASS', '');              // Change to your MySQL password
+define('DB_NAME', 'fitlife_cms');  
+define('DB_USER', 'root');          
+define('DB_PASS', '');              
 define('DB_CHARSET', 'utf8mb4');
 
 /**
- * Get PDO database connection
+ * 
  * @return PDO Database connection object
  */
 function getDBConnection() {
     static $pdo = null;
     
-    // Return existing connection if already created
+    // Return existing connection
     if ($pdo !== null) {
         return $pdo;
     }
@@ -45,7 +44,7 @@ function getDBConnection() {
 }
 
 /**
- * Test database connection
+ * Testing database connection
  * @return bool True if connection successful
  */
 function testDBConnection() {

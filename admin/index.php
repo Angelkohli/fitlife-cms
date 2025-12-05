@@ -4,7 +4,7 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
 
-// Simple authentication for Week 11 (will improve in Week 14)
+// Simple authentication
 initSession();
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header('Location: ../public/login.php');

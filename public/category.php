@@ -1,5 +1,5 @@
 <?php
-// Public - Browse Classes by Category (Feature 2.8 - 5 marks)
+//  Browse Classes by Category (2.8)
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
@@ -8,7 +8,7 @@ $pdo = getDBConnection();
 $css_path = '../assets/css/style.css';
 $js_path = '../assets/js/main.js';
 
-// Get and validate category ID (Feature 4.2)
+// Get and validate category ID (4.2)
 $category_id = sanitizeID($_GET['id'] ?? 0);
 
 if (!$category_id) {

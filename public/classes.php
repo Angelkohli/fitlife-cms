@@ -1,5 +1,5 @@
 <?php
-// Public - Browse All Classes (Feature 2.7 - Navigation/Menu)
+// Browse Classes (2.7)
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
@@ -9,7 +9,7 @@ $page_title = "All Classes";
 $css_path = '../assets/css/style.css';
 $js_path = '../assets/js/main.js';
 
-// Fetch all active classes with category information - ORDERED BY CLASS_ID
+// Fetch all active classes with category information 
 $stmt = $pdo->query("
     SELECT c.*, cat.category_name, cat.color_code
     FROM classes c
@@ -35,7 +35,7 @@ include '../includes/header.php';
 </div>
 
 
-<!-- Classes displayed in grid - Ordered by Class ID -->
+<!-- Classes displayed in grid  -->
 <?php if (count($classes) > 0): ?>
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">

@@ -1,5 +1,5 @@
 <?php
-// Logout Handler (Feature 7.4)
+// Logout (7.4)
 session_start();
 session_unset();
 session_destroy();

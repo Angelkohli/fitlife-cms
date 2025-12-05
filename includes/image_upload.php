@@ -1,7 +1,7 @@
 <?php
 /**
- * Image Upload Handler (Feature 6.1 - 5 marks)
- * Handles instructor image uploads with validation
+ * Image Upload Handler (6.1)
+ * 
  */
 
 
@@ -25,34 +25,34 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
         return $result;
     }
     
-    // Check for upload errors
+    // Check upload errors
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $result['error'] = 'Upload error: ' . $file['error'];
         return $result;
     }
     
     // Validate file size (max 5MB)
-    $max_size = 5 * 1024 * 1024; // 5MB in bytes
+    $max_size = 5 * 1024 * 1024; 
     if ($file['size'] > $max_size) {
         $result['error'] = 'File too large. Maximum size is 5MB';
         return $result;
     }
     
-    // Check if file is an actual image (Feature 6.1 requirement)
+    // Check if file is an actual image (6.1)
     $check = getimagesize($file['tmp_name']);
     if ($check === false) {
         $result['error'] = 'File is not a valid image';
         return $result;
     }
     
-    // Allowed image types
+    // Allowed types
     $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!in_array($check['mime'], $allowed_types)) {
         $result['error'] = 'Invalid image type. Allowed: JPG, PNG, GIF, WebP';
         return $result;
     }
     
-    // Generate unique filename
+    // Generate filename
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = 'instructor_' . uniqid() . '_' . time() . '.' . strtolower($extension);
     $target_path = $upload_dir . $filename;
@@ -64,16 +64,16 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
     
     // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $target_path)) {
-        // Auto-resize image only if GD is available (Feature 6.3 - 5 marks)
+        // Auto-resize image(6.3)
         if (isGDAvailable()) {
             $resize_result = resizeImage($target_path, 800, 600);
             if (!$resize_result) {
                 error_log("Image resize failed for: " . $filename);
-                // Continue anyway - the upload was successful
+                
             }
         } else {
             error_log("GD extension not available - image uploaded but not resized");
-            // You might want to show a warning to the admin
+            
         }
         
         $result['success'] = true;
@@ -86,10 +86,10 @@ function uploadInstructorImage($file, $upload_dir = '../uploads/instructors/') {
 }
 
 /**
- * Resize image to maximum dimensions (Feature 6.3)
+ * Resize image to maximum dimensions (6.3)
  */
 function resizeImage($file_path, $max_width = 800, $max_height = 600) {
-    // Get image info
+    
     $image_info = getimagesize($file_path);
     if ($image_info === false) {
         error_log("Cannot get image size for: " . $file_path);
@@ -100,10 +100,10 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
     
     // Check if resize is needed
     if ($orig_width <= $max_width && $orig_height <= $max_height) {
-        return true; // No resize needed
+        return true; 
     }
     
-    // Calculate new dimensions while maintaining aspect ratio
+    // new dimensions
     $ratio = $orig_width / $orig_height;
     
     if ($max_width / $max_height > $ratio) {
@@ -117,7 +117,7 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
     $new_width = round($new_width);
     $new_height = round($new_height);
     
-    // Create image resource from file based on image type
+    // Create image based on image type
     switch ($image_type) {
         case IMAGETYPE_JPEG:
             $source = imagecreatefromjpeg($file_path);
@@ -179,24 +179,24 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
     $success = false;
     switch ($image_type) {
         case IMAGETYPE_JPEG:
-            $success = imagejpeg($resized, $file_path, 85); // 85% quality
+            $success = imagejpeg($resized, $file_path, 85); 
             break;
         case IMAGETYPE_PNG:
-            $success = imagepng($resized, $file_path, 8); // Compression level 8 (0-9)
+            $success = imagepng($resized, $file_path, 8); 
             break;
         case IMAGETYPE_GIF:
             $success = imagegif($resized, $file_path);
             break;
         case IMAGETYPE_WEBP:
             if (function_exists('imagewebp')) {
-                $success = imagewebp($resized, $file_path, 85); // 85% quality
+                $success = imagewebp($resized, $file_path, 85); 
             } else {
                 $success = false;
             }
             break;
     }
     
-    // Free memory
+ 
     imagedestroy($source);
     imagedestroy($resized);
     
@@ -209,7 +209,7 @@ function resizeImage($file_path, $max_width = 800, $max_height = 600) {
 }
 
 /**
- * Delete instructor image
+ * Delete image
  */
 function deleteInstructorImage($filename, $upload_dir = '../uploads/instructors/') {
     if (empty($filename)) {
@@ -232,7 +232,7 @@ function validateImageFile($file) {
     $result = ['valid' => false, 'error' => ''];
     
     if (!isset($file) || $file['error'] === UPLOAD_ERR_NO_FILE) {
-        return $result; // No file is ok (optional upload)
+        return $result; 
     }
     
     if ($file['error'] !== UPLOAD_ERR_OK) {

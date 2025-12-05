@@ -1,5 +1,5 @@
 <?php
-// Admin - Create User (Feature 7.2)
+// Creating User (7.2)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';

@@ -1,4 +1,4 @@
--- FitLife Winnipeg CMS Database Schema
+-- FitLife Winnipeg 
 -- Drop tables if they exist (in reverse order of dependencies)
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS classes;

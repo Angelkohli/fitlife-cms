@@ -1,5 +1,5 @@
 <?php
-// Admin - Create Category (Feature 2.4 - Part of 5 marks)
+// Admin - Create(2.4)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -18,9 +18,9 @@ $css_path = '../../assets/css/style.css';
 $errors = [];
 $form_data = [];
 
-// Handle form submission
+//form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize input (Feature 4.3)
+    // Sanitize input (4.3)
     $form_data = [
         'category_name' => sanitizeString($_POST['category_name'] ?? ''),
         'category_description' => sanitizeString($_POST['category_description'] ?? ''),

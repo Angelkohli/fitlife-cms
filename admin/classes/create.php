@@ -1,5 +1,5 @@
 <?php
-// Admin - Create New Class (Feature 2.1 - 5 marks)
+//  Creating New Class(2.1)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -19,13 +19,13 @@ $css_path = '../../assets/css/style.css';
 $errors = [];
 $form_data = [];
 
-// Fetch categories for dropdown
+// Fetching categories for dropdown
 $stmt = $pdo->query("SELECT * FROM categories ORDER BY display_order, category_name");
 $categories = $stmt->fetchAll();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize all input data (Feature 4.3)
+    // Sanitize all input data (4.3)
     $form_data = [
         'class_name' => sanitizeString($_POST['class_name'] ?? ''),
         'class_description' => sanitizeString($_POST['class_description'] ?? ''),
@@ -35,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'is_featured' => isset($_POST['is_featured']) ? 1 : 0
     ];
     
-    // Validate form data (Feature 4.1)
+    // Validate form data (4.1)
     $errors = validateClassData($form_data);
     
-    // Handle image upload (Feature 6.1)
+    // Handle image upload (6.1)
     $uploaded_image = null;
     if (isset($_FILES['instructor_image']) && $_FILES['instructor_image']['error'] !== UPLOAD_ERR_NO_FILE) {
         $upload_result = uploadInstructorImage($_FILES['instructor_image']);
@@ -157,7 +157,7 @@ include '../../includes/header.php';
                         </div>
                     </div>
                     
-                    <!-- Image Upload (Feature 6.1) -->
+                    <!-- Image Upload (6.1) -->
                     <div class="form-group">
                         <label for="instructor_image">Instructor Photo (Optional)</label>
                         <input type="file" 

@@ -1,5 +1,5 @@
 <?php
-// Admin - Delete User (Feature 7.2)
+//Delete User (7.2)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -16,7 +16,7 @@ if (!$user_id) {
     exit;
 }
 
-// Prevent deleting yourself
+// Preventing deleting yourself
 if ($user_id == $_SESSION['user_id']) {
     setFlashMessage('You cannot delete your own account', 'error');
     header('Location: index.php');
@@ -37,7 +37,7 @@ if (!$user) {
 // Handle deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     try {
-        // Delete user (CASCADE will handle reviews if user_id is set in reviews)
+        // Delete user
         $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = :id");
         $stmt->execute([':id' => $user_id]);
         

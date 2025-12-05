@@ -1,5 +1,5 @@
 <?php
-// Admin - Manage Categories (Feature 2.4 - 5 marks)
+// Admin - Managing Categories(2.4)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -15,7 +15,7 @@ $page_title = "Manage Categories";
 $is_admin = true;
 $css_path = '../../assets/css/style.css';
 
-// Fetch all categories with class count
+// Fetching all categories with class count
 $stmt = $pdo->query("
     SELECT cat.*, COUNT(c.class_id) as class_count
     FROM categories cat
@@ -102,13 +102,13 @@ include '../../includes/header.php';
                                                     disabled>
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                        <?php endif; ?>
+                                     <?php endif; ?>
                                     </div>
                                 </td>
-                            </tr>
+                         </tr>
                         <?php endforeach; ?>
                     </tbody>
-                </table>
+             </table>
             </div>
         </div>
     </div>

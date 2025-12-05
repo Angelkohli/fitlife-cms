@@ -1,5 +1,5 @@
 <?php
-// Admin - Edit User (Feature 7.2)
+//Edit User (7.2)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Full name is required";
     }
     
-    // Check duplicates (excluding current user)
+    // Check duplicates
     if (empty($errors)) {
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND user_id != :id");
         $stmt->execute([':username' => $form_data['username'], ':id' => $user_id]);
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update user
     if (empty($errors)) {
         try {
-            // Build SQL based on whether password is being changed
+            
             if (!empty($form_data['password'])) {
                 $hashed_password = password_hash($form_data['password'], PASSWORD_DEFAULT);
                 $sql = "UPDATE users SET

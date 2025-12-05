@@ -1,5 +1,5 @@
 <?php
-// Public Homepage (Feature 2.7 - 5 marks)
+// Public Homepage (2.7)
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
@@ -12,7 +12,7 @@ $js_path = '../assets/js/main.js';
 // Check if a category filter is selected
 $selected_category = isset($_GET['category']) ? (int)$_GET['category'] : 0;
 
-// Fetch featured classes (filtered by category if selected)
+// Fetch featured classes
 if ($selected_category > 0) {
     $stmt = $pdo->prepare("
         SELECT c.*, cat.category_name, cat.color_code
@@ -177,7 +177,7 @@ include '../includes/header.php';
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     <?php if ($class['instructor_image_path']): ?>
-                        <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                        <img src="../admin/uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                              class="card-img-top" 
                              alt="<?= sanitizeString($class['instructor_name']) ?>"
                              style="height: 200px; object-fit: cover;">
@@ -281,7 +281,7 @@ include '../includes/header.php';
 <?php include '../includes/footer.php'; ?>
 
 <?php
-// Helper function to get category icon by ID
+//   to get category icon by ID
 function getCategoryIconById($categories, $category_id) {
     foreach ($categories as $cat) {
         if ($cat['category_id'] == $category_id) {
@@ -291,7 +291,7 @@ function getCategoryIconById($categories, $category_id) {
     return 'fa-tag';
 }
 
-// Helper function to get category color by ID
+// to get category color by ID
 function getCategoryColorById($categories, $category_id) {
     foreach ($categories as $cat) {
         if ($cat['category_id'] == $category_id) {

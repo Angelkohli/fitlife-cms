@@ -1,5 +1,5 @@
 <?php
-// Public - User Login (Feature 7.4 - 5 marks)
+//  User Login (7.4)
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
@@ -19,7 +19,7 @@ if (isLoggedIn()) {
 $pdo = getDBConnection();
 $error = '';
 
-// Handle login submission
+//  login submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = sanitizeString($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter both username and password';
     } else {
         try {
-            // Fetch user from database (both admin and regular users)
+            // Fetch user from database 
             $stmt = $pdo->prepare("
                 SELECT *
                 FROM users 
@@ -42,9 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$user['is_active']) {
                     $error = 'Your account has been deactivated. Please contact support.';
                 } 
-                // Verify password (Feature 7.3)
+                // Verify password (7.3)
                 elseif (password_verify($password, $user['user_password'])) {
-                    // Login successful - set session variables
+                    
                     $_SESSION['user_id'] = $user['user_id'];
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['full_name'] = $user['full_name'];
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE user_id = :id");
                     $stmt->execute([':id' => $user['user_id']]);
                     
-                    // Set success message
+                    
                     setFlashMessage('Welcome back, ' . $user['full_name'] . '!', 'success');
                     
                     // Redirect based on role

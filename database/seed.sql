@@ -1,4 +1,4 @@
--- FitLife Winnipeg - Sample Data
+-- FitLife Winnipeg 
 -- Categories
 INSERT INTO categories (category_name, category_description, category_icon, color_code, display_order) VALUES
 ('Yoga', 'Improve flexibility, balance and mental clarity through various yoga styles', 'fa-spa', '#9C27B0', 1),
@@ -8,7 +8,7 @@ INSERT INTO categories (category_name, category_description, category_icon, colo
 ('Cycling', 'Indoor cycling classes for endurance and leg strength', 'fa-bicycle', '#00BCD4', 5),
 ('Mind-Body', 'Classes focused on mindfulness, flexibility and core strength', 'fa-leaf', '#4CAF50', 6);
 
--- Fitness Classes (12 real classes with detailed descriptions)
+-- Fitness Classes (12 classes and descriptions)
 INSERT INTO classes (class_name, class_description, instructor_name, duration_minutes, difficulty_level, max_participants, day_of_week, start_time, class_location, room_number, equipment_needed, calories_burned_avg, category_id, is_active, is_featured, slug) VALUES
 
 ('Morning Power Yoga', 'Start your day with an energizing yoga flow that combines strength-building poses with mindful breathing. This dynamic class will wake up your body and mind, improve flexibility, and set a positive tone for your entire day. Perfect for those who want to challenge themselves while maintaining a mindful practice.', 'Sarah Mitchell', 60, 'Intermediate', 25, 'Monday', '06:30:00', 'Downtown', 'Studio A', 'Yoga mat, water bottle', 350, 1, 1, 1, 'morning-power-yoga'),

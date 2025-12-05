@@ -1,11 +1,10 @@
 <?php
 /**
- * Validation and Sanitization Functions
- * Feature 4.1, 4.2, 4.3 - Security & Validation
+ * (4.1, 4.2, 4.3 - Security & Validation)
  */
 
 /**
- * Sanitize and validate an ID (Feature 4.2)
+ * Sanitize and validate an ID (4.2)
  */
 function sanitizeID($id) {
     $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -13,7 +12,7 @@ function sanitizeID($id) {
 }
 
 /**
- * Sanitize string to prevent XSS attacks (Feature 4.3)
+ * Sanitize string to prevent attacks (4.3)
  */
 function sanitizeString($string) {
     return htmlspecialchars(trim($string), ENT_QUOTES, 'UTF-8');
@@ -23,7 +22,7 @@ function sanitizeString($string) {
  * Sanitize HTML content (for WYSIWYG editors)
  */
 function sanitizeHTML($html) {
-    // Allow specific HTML tags for WYSIWYG content
+    
     $allowed_tags = '<p><br><strong><em><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img>';
     return strip_tags(trim($html), $allowed_tags);
 }
@@ -37,28 +36,28 @@ function validateEmail($email) {
 }
 
 /**
- * Validate class data (Feature 4.1)
+ * Validate class data (4.1)
  */
 function validateClassData($data) {
     $errors = [];
     
-    // Class name validation
+    // Class name
     if (empty($data['class_name']) || strlen(trim($data['class_name'])) < 3) {
         $errors[] = "Class name is required (minimum 3 characters)";
     }
     
-    // Description validation
+    // Description
     if (empty($data['class_description']) || strlen(trim($data['class_description'])) < 20) {
         $errors[] = "Class description is required (minimum 20 characters)";
     }
     
-    // Instructor name validation
+    // Instructor 
     if (empty($data['instructor_name']) || strlen(trim($data['instructor_name'])) < 2) {
         $errors[] = "Instructor name is required";
     }
     
     
-    // Category validation (if provided)
+    // Category 
     if (!empty($data['category_id'])) {
         $category_id = sanitizeID($data['category_id']);
         if ($category_id === false) {
@@ -70,7 +69,7 @@ function validateClassData($data) {
 }
 
 /**
- * Validate user registration data
+ * Validate user data
  */
 function validateUserData($data) {
     $errors = [];

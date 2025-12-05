@@ -16,7 +16,7 @@ if (!defined('BASE_URL')) {
     <title><?= isset($page_title) ? $page_title . ' - ' : '' ?>FitLife Winnipeg CMS</title>
     
     <!-- Bootstrap CSS -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -36,7 +36,7 @@ if (!defined('BASE_URL')) {
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Search Form (Feature 3.1) -->
+                <!-- Search Form (3.1) -->
                 <?php if (!isset($is_admin) || !$is_admin): ?>
                     <form method="GET" action="<?= isset($is_admin) && $is_admin ? '../public/search.php' : 'search.php' ?>" class="form-inline mx-auto my-2 my-lg-0">
                         <div class="input-group">

@@ -52,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'is_featured' => isset($_POST['is_featured']) ? 1 : 0
     ];
     
-    // Handle image operations (Feature 6.1 & 6.2)
+    // Handle image operations (6.1 & 6.2)
     $new_image_path = $class['instructor_image_path'];
 
-    // Delete existing image if requested (Feature 6.2)
+    // Delete existing image(6.2)
     if (isset($_POST['delete_image']) && $class['instructor_image_path']) {
         deleteInstructorImage($class['instructor_image_path']);
         $new_image_path = null;
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['instructor_image']) && $_FILES['instructor_image']['error'] !== UPLOAD_ERR_NO_FILE) {
         $upload_result = uploadInstructorImage($_FILES['instructor_image']);
         if ($upload_result['success']) {
-            // Delete old image if exists (Feature 6.2)
+            // Delete old image if exists (6.2)
             if ($class['instructor_image_path']) {
                 deleteInstructorImage($class['instructor_image_path']);
             }
@@ -169,12 +169,12 @@ include '../../includes/header.php';
                     <div class="row">
                         <div class="col-md-6">
 
-                            <!-- Current Image Display (Feature 6.4) -->
+                            <!-- Current Image Display (6.4) -->
                             <?php if ($class['instructor_image_path']): ?>
                                 <div class="form-group">
                                     <label>Current Instructor Photo</label>
                                     <div>
-                                        <img src="../../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
+                                        <img src="../uploads/instructors/<?= sanitizeString($class['instructor_image_path']) ?>" 
                                             alt="Current instructor photo" 
                                             class="img-thumbnail"
                                             style="max-width: 200px;">
@@ -188,7 +188,7 @@ include '../../includes/header.php';
                                 </div>
                             <?php endif; ?>
                             
-                            <!-- Upload New Image (Feature 6.1) -->
+                            <!-- Upload New Image (6.1) -->
                             <div class="form-group">
                                 <label for="instructor_image">
                                     <?= $class['instructor_image_path'] ? 'Replace' : 'Upload' ?> Instructor Photo (Optional)

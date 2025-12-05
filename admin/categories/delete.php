@@ -1,5 +1,5 @@
 <?php
-// Admin - Delete Category (Optional - Feature 2.4)
+// Admin - Delete(2.4)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -19,7 +19,7 @@ if (!$category_id) {
     exit;
 }
 
-// Fetch category and check if it has classes
+// Fetching category and check if it has classes
 $stmt = $pdo->prepare("
     SELECT cat.*, COUNT(c.class_id) as class_count
     FROM categories cat
@@ -36,14 +36,14 @@ if (!$category) {
     exit;
 }
 
-// Prevent deletion if category has classes
+// Preventing deletion if category has classes
 if ($category['class_count'] > 0) {
     setFlashMessage('Cannot delete category: ' . $category['class_count'] . ' classes are assigned to it', 'error');
     header('Location: index.php');
     exit;
 }
 
-// Handle deletion
+// Handling deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     try {
         $stmt = $pdo->prepare("DELETE FROM categories WHERE category_id = :id");

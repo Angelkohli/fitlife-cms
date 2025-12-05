@@ -1,5 +1,5 @@
 <?php
-// Public - User Registration (Feature 7.5 - 5 marks)
+//  User Registration (7.5)
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
@@ -19,7 +19,7 @@ $success = false;
 
 // Handle registration submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize input
+    
     $form_data = [
         'username' => sanitizeString($_POST['username'] ?? ''),
         'email' => sanitizeString($_POST['email'] ?? ''),
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Password must be at least 6 characters";
     }
     
-    // Check if passwords match (Feature 7.5 requirement)
+    // Check if passwords match (7.5)
     if ($form_data['password'] !== $form_data['password_confirm']) {
         $errors[] = "Passwords do not match";
     }
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If no errors, create account
     if (empty($errors)) {
         try {
-            // Hash password (Feature 7.3)
+            // Hash password (7.3)
             $hashed_password = password_hash($form_data['password'], PASSWORD_DEFAULT);
             
             $sql = "INSERT INTO users (

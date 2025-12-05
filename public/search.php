@@ -1,5 +1,5 @@
 <?php
-// Public - Search Classes (Feature 3.1 - 5 marks)
+// Search Classes (3.1)
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
@@ -14,8 +14,8 @@ $category_filter = '';
 $results = [];
 $searched = false;
 
-// Pagination settings (Feature 3.3 - 5 marks)
-$results_per_page = 6; // Easy to change for testing
+// Pagination (3.3 )
+$results_per_page = 6; 
 $current_page = sanitizeID($_GET['page'] ?? 1);
 if ($current_page < 1) $current_page = 1;
 $offset = ($current_page - 1) * $results_per_page;
@@ -31,7 +31,7 @@ if (isset($_GET['q'])) {
     $searched = true;
     
     if (!empty($search_query)) {
-        // Build query with optional category filter (Feature 3.2 - 5 marks)
+        // Build query with optional category filter (3.2)
         $sql = "
             SELECT c.*, cat.category_name, cat.color_code
             FROM classes c
@@ -51,7 +51,7 @@ if (isset($_GET['q'])) {
         
         $sql .= " ORDER BY c.class_name";
 
-        // First, get total count for pagination
+        //  total count for pagination
         $count_sql = "SELECT COUNT(*) as total FROM ($sql) AS count_table";
         $stmt = $pdo->prepare($count_sql);
         $params = [
@@ -73,7 +73,7 @@ if (isset($_GET['q'])) {
             $current_page = $total_pages;
         }
 
-        // Now get the actual results with pagination
+        //  actual results with pagination
         $sql .= " LIMIT :limit OFFSET :offset";
         $stmt = $pdo->prepare($sql);
         
@@ -216,7 +216,7 @@ include '../includes/header.php';
                 <?php endforeach; ?>
             </div>
 
-            <!-- Pagination (Feature 3.3 - 5 marks) -->
+            <!-- Pagination (3.3 ) -->
             <?php if ($total_pages > 1): ?>
                 <nav aria-label="Search results pagination">
                     <ul class="pagination justify-content-center">

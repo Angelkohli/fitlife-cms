@@ -1,10 +1,8 @@
 <?php
-/**
- * Helper Functions for FitLife CMS
- */
+
 
 /**
- * Start session if not already started
+ * Start session
  */
 function initSession() {
     if (session_status() === PHP_SESSION_NONE) {
@@ -29,7 +27,7 @@ function isAdmin() {
 }
 
 /**
- * Require admin access or redirect
+ * Require admin access 
  */
 function requireAdmin($redirect_url = '../index.php') {
     if (!isAdmin()) {
@@ -90,7 +88,7 @@ function displayFlashMessage() {
 }
 
 /**
- * Format time for display (24hr to 12hr)
+ * Format time for display
  */
 function formatTime($time) {
     return date('g:i A', strtotime($time));
@@ -129,7 +127,7 @@ function redirect($url) {
 }
 
 /**
- * Get difficulty level badge color
+ * difficulty level color
  */
 function getDifficultyBadgeColor($level) {
     switch($level) {
@@ -141,7 +139,7 @@ function getDifficultyBadgeColor($level) {
 }
 
 /**
- * Truncate text to specified length
+ * Truncate text
  */
 function truncateText($text, $length = 100, $suffix = '...') {
     if (strlen($text) <= $length) {
@@ -151,7 +149,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
 }
 
 /**
- * Debug function - displays formatted array
+ * Debug function 
  */
 function debug($data) {
     echo '<pre>';

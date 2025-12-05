@@ -15,23 +15,23 @@ $page_title = "Manage Classes";
 $is_admin = true;
 $css_path = '../../assets/css/style.css';
 
-// Get sort parameter and validate (Feature 4.2 - ID sanitization)
+// (4.2 - ID sanitization)
 $allowed_sort = ['class_name', 'created_at', 'updated_at'];
 $sort_by = sanitizeString($_GET['sort'] ?? 'created_at');
 
-// Validate sort parameter
+// Validate sort
 if (!in_array($sort_by, $allowed_sort)) {
     $sort_by = 'created_at';
 }
 
-// Get sort order (ascending or descending)
+// Get sort order
 $order = sanitizeString($_GET['order'] ?? 'DESC');
 $order = ($order === 'ASC') ? 'ASC' : 'DESC';
 
 // Toggle order for next click
 $next_order = ($order === 'ASC') ? 'DESC' : 'ASC';
 
-// Build query with sorting
+// query with sorting
 $sql = "
     SELECT c.*, cat.category_name 
     FROM classes c
@@ -57,7 +57,7 @@ include '../../includes/header.php';
     </div>
 </div>
 
-<!-- Sorting Controls (Feature 2.3) -->
+<!-- Sorting(2.3) -->
 <div class="card mb-3">
     <div class="card-body">
         <div class="row align-items-center">
@@ -160,10 +160,10 @@ include '../../includes/header.php';
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
-                                </td>
+                             </td>
                             </tr>
                         <?php endforeach; ?>
-                    </tbody>
+                </tbody>
                 </table>
             </div>
         </div>

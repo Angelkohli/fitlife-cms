@@ -1,10 +1,10 @@
 <?php
-// Public - Class Detail Page
+//  Class Detail Page
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/validation.php';
-
 require_once '../includes/captcha.php';
+
 
 $pdo = getDBConnection();
 $css_path = '../assets/css/style.css';
@@ -163,55 +163,65 @@ include '../includes/header.php';
             </div>
         </div>
         
-        <!-- Comment Form (Feature 2.9 - 5 marks) -->
+        <!-- Comment Form (2.9) -->
         <div class="card mt-4" id="comment-form">
             <div class="card-header bg-primary text-white">
                 <h4 class="mb-0"><i class="fas fa-edit"></i> Leave a Review</h4>
             </div>
             <div class="card-body">
                 <?php
-                // Handle comment submission
+                // comment submission
                 $comment_errors = [];
                 $comment_success = false;
                 
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
-                    // Use logged-in user's name or form input for anonymous users
+                    
+                    // Store form data 
                     $member_name = $is_logged_in ? $current_user_name : sanitizeString($_POST['member_name'] ?? '');
                     
-                    // Sanitize input
                     $comment_data = [
                         'member_name' => $member_name,
                         'review_text' => sanitizeString($_POST['review_text'] ?? ''),
                         'review_rating' => sanitizeID($_POST['review_rating'] ?? 0)
                     ];
                     
-                    // Validate
-                    $comment_errors = validateCommentData($comment_data);
+                    // Validate CAPTCHA 
+                    $captcha_input = sanitizeString($_POST['captcha'] ?? '');
                     
+                    if (!validateCaptcha($captcha_input)) {
+                        $comment_errors[] = "Invalid CAPTCHA. Please try again.";
+                    }
+                    
+                    // Only validate and insert if CAPTCHA passed
                     if (empty($comment_errors)) {
-                        try {
-                            $sql = "INSERT INTO reviews (
-                                class_id, member_name, review_text, review_rating,
-                                difficulty_accurate, would_recommend, is_approved
-                            ) VALUES (
-                                :class_id, :member_name, :review_text, :review_rating,
-                                :difficulty_accurate, :would_recommend, 0
-                            )";
-                            
-                            $stmt = $pdo->prepare($sql);
-                            $stmt->execute([
-                                ':class_id' => $class_id,
-                                ':member_name' => $comment_data['member_name'],
-                                ':review_text' => $comment_data['review_text'],
-                                ':review_rating' => $comment_data['review_rating'],
-                                ':difficulty_accurate' => isset($_POST['difficulty_accurate']) ? 1 : 0,
-                                ':would_recommend' => isset($_POST['would_recommend']) ? 1 : 0
-                            ]);
-                            
-                            $comment_success = true;
-                            
-                        } catch (PDOException $e) {
-                            $comment_errors[] = "Error submitting review: " . $e->getMessage();
+                        // Validate comment data
+                        $comment_errors = validateCommentData($comment_data);
+                        
+                        if (empty($comment_errors)) {
+                            try {
+                                $sql = "INSERT INTO reviews (
+                                    class_id, member_name, review_text, review_rating,
+                                    difficulty_accurate, would_recommend, is_approved
+                                ) VALUES (
+                                    :class_id, :member_name, :review_text, :review_rating,
+                                    :difficulty_accurate, :would_recommend, 0
+                                )";
+                                
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute([
+                                    ':class_id' => $class_id,
+                                    ':member_name' => $comment_data['member_name'],
+                                    ':review_text' => $comment_data['review_text'],
+                                    ':review_rating' => $comment_data['review_rating'],
+                                    ':difficulty_accurate' => isset($_POST['difficulty_accurate']) ? 1 : 0,
+                                    ':would_recommend' => isset($_POST['would_recommend']) ? 1 : 0
+                                ]);
+                                
+                                $comment_success = true;
+                                
+                            } catch (PDOException $e) {
+                                $comment_errors[] = "Error submitting review: " . $e->getMessage();
+                            }
                         }
                     }
                 }
@@ -239,7 +249,7 @@ include '../includes/header.php';
                 <?php if (!$comment_success): ?>
                     <form method="POST" action="#comment-form">
                         <?php if ($is_logged_in): ?>
-                            <!-- Logged in user - show their name -->
+                            <!-- Logged in user -->
                             <div class="form-group">
                                 <label>Your Name</label>
                                 <p class="form-control-plaintext font-weight-bold">
@@ -249,14 +259,14 @@ include '../includes/header.php';
                                 <input type="hidden" name="member_name" value="<?= sanitizeString($current_user_name) ?>">
                             </div>
                         <?php else: ?>
-                            <!-- Not logged in - show name input field -->
+                            <!-- Not logged in-->
                             <div class="form-group">
                                 <label for="member_name">Your Name *</label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="member_name" 
                                        name="member_name"
-                                       value="<?= isset($comment_data) ? $comment_data['member_name'] : '' ?>"
+                                       value="<?= isset($comment_data) ? sanitizeString($comment_data['member_name']) : '' ?>"
                                        required>
                             </div>
                         <?php endif; ?>
@@ -265,11 +275,11 @@ include '../includes/header.php';
                             <label for="review_rating">Rating *</label>
                             <select class="form-control" id="review_rating" name="review_rating" required>
                                 <option value="">-- Select Rating --</option>
-                                <option value="5">⭐⭐⭐⭐⭐ (5 stars - Excellent)</option>
-                                <option value="4">⭐⭐⭐⭐ (4 stars - Very Good)</option>
-                                <option value="3">⭐⭐⭐ (3 stars - Good)</option>
-                                <option value="2">⭐⭐ (2 stars - Fair)</option>
-                                <option value="1">⭐ (1 star - Poor)</option>
+                                <option value="5" <?= (isset($comment_data) && $comment_data['review_rating'] == 5) ? 'selected' : '' ?>>★★★★★ (5 stars - Excellent)</option>
+                                <option value="4" <?= (isset($comment_data) && $comment_data['review_rating'] == 4) ? 'selected' : '' ?>>★★★★ (4 stars - Very Good)</option>
+                                <option value="3" <?= (isset($comment_data) && $comment_data['review_rating'] == 3) ? 'selected' : '' ?>>★★★ (3 stars - Good)</option>
+                                <option value="2" <?= (isset($comment_data) && $comment_data['review_rating'] == 2) ? 'selected' : '' ?>>★★ (2 stars - Fair)</option>
+                                <option value="1" <?= (isset($comment_data) && $comment_data['review_rating'] == 1) ? 'selected' : '' ?>>★ (1 star - Poor)</option>
                             </select>
                         </div>
                         
@@ -280,7 +290,7 @@ include '../includes/header.php';
                                       name="review_text"
                                       rows="5"
                                       placeholder="Share your experience with this class..."
-                                      required><?= isset($comment_data) ? $comment_data['review_text'] : '' ?></textarea>
+                                      required><?= isset($comment_data) ? sanitizeString($comment_data['review_text']) : '' ?></textarea>
                             <small class="form-text text-muted">Minimum 10 characters</small>
                         </div>
                         
@@ -288,7 +298,8 @@ include '../includes/header.php';
                             <input type="checkbox" 
                                    class="form-check-input" 
                                    id="difficulty_accurate" 
-                                   name="difficulty_accurate">
+                                   name="difficulty_accurate"
+                                   <?= (isset($_POST['difficulty_accurate'])) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="difficulty_accurate">
                                 The difficulty level was accurate
                             </label>
@@ -299,11 +310,39 @@ include '../includes/header.php';
                                    class="form-check-input" 
                                    id="would_recommend" 
                                    name="would_recommend"
-                                   checked>
+                                   <?= (!isset($_POST['submit_review']) || isset($_POST['would_recommend'])) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="would_recommend">
                                 I would recommend this class to others
                             </label>
                         </div>
+
+                        <div class="form-group">
+                            <label for="captcha">Verify You're Human *</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <img src="../captcha/generate.php" 
+                                         alt="CAPTCHA" 
+                                         id="captcha-image"
+                                         class="img-thumbnail mb-2"
+                                         style="cursor: pointer;"
+                                         onclick="this.src='../captcha/generate.php?'+Math.random();">
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-sync-alt"></i> Click image to refresh
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           id="captcha" 
+                                           name="captcha"
+                                           placeholder="Enter code shown above"
+                                           autocomplete="off"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
                         
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i> 

@@ -1,5 +1,5 @@
 <?php
-// Admin - Delete Class (Feature 2.2 - Part of 5 marks)
+// Admin - Delete Class (2.2)
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/validation.php';
@@ -12,7 +12,7 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 
 $pdo = getDBConnection();
 
-// Sanitize and validate the ID (Feature 4.2)
+// Sanitize and validate the ID (4.2)
 $class_id = sanitizeID($_GET['id'] ?? 0);
 
 if (!$class_id) {
@@ -35,7 +35,7 @@ if (!$class) {
 // Handle the deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     try {
-        // Delete the class (CASCADE will handle related reviews)
+        // Delete the class 
         $stmt = $pdo->prepare("DELETE FROM classes WHERE class_id = :class_id");
         $stmt->execute([':class_id' => $class_id]);
         
